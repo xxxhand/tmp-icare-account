@@ -1,0 +1,17 @@
+{
+  "ENABLE_CACHE": false,
+  "DEFAULT_MONGO": {
+    "URI": "mongodb://localhost:27017/ccrc_test",
+    "USER": "",
+    "PASS": "",
+    "POOL_SIZE": 10,
+    "DB_NAME": "ccrc_test"
+  },
+  "DEFAULT_REDIS": {
+    "URI": "redis://hellokitty@localhost:6379/0",
+    "HOST": "localhost",
+    "PORT": 6379,
+    "PASS": "hellokitty",
+    "DB_NAME": 0
+  }
+}

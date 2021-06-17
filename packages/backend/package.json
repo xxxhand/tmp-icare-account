@@ -1,0 +1,55 @@
+{
+  "name": "@demo/backend",
+  "version": "0.0.5",
+  "description": "> TODO: description",
+  "author": "hand_wu <Hand_Wu@compal.com>",
+  "homepage": "https://github.com/xxxhand/ts-mono-sample#readme",
+  "license": "ISC",
+  "main": "build/index",
+  "types": "build/index",
+  "directories": {
+    "test": "__tests__"
+  },
+  "files": [
+    "__tests__"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xxxhand/ts-mono-sample.git"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "npx rimraf ./build tsconfig.tsbuildinfo",
+    "clean:mod": "npx rimraf ./node_modules",
+    "compile": "npx tsc -b",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/xxxhand/ts-mono-sample/issues"
+  },
+  "dependencies": {
+    "@demo/app-common": "^0.0.5",
+    "bluebird": "^3.7.2",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "fs-extra": "^10.0.0",
+    "inversify": "^5.0.5",
+    "inversify-inject-decorators": "^3.1.0",
+    "multer": "^1.4.2",
+    "socket.io": "^4.0.1",
+    "socket.io-redis": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.0",
+    "@types/express": "^4.17.12",
+    "@types/fs-extra": "^9.0.11",
+    "@types/multer": "^1.4.5",
+    "@types/socket.io": "^2.1.13",
+    "p-event": "^4.2.0",
+    "socket.io-client": "^4.0.1",
+    "typescript": "^4.2.4"
+  }
+}

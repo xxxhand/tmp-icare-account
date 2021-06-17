@@ -1,0 +1,14 @@
+{
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "command": {
+    "version": {
+      "push": false,
+      "message": "Release: publish $s"
+    }
+  },
+  "packages": [
+    "packages/*"
+  ],
+  "version": "0.0.5"
+}

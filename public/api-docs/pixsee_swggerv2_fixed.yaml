@@ -1,0 +1,3905 @@
+swagger: "2.0"
+info:
+    description: ""
+    version: "1.12.0"
+    title: "PIXSEE"
+host: "api.ipg-services.com"
+basePath: "/api/v1"
+tags:
+    - name: Authorization
+      description: For register, login, exchange access token...etc
+    - name: Account
+    - name: Device
+    - name: Storage
+      description: Upload and download files by app and edge
+    - name: Baby
+    - name: Member
+    - name: Special card
+    - name: Events
+      description: For events detected from edge, like cry, e-fence...etc
+    - name: Subscriptions
+    - name: Others
+      description: Some defined data, like countries, relationships...etc
+schemes:
+    - "https"
+paths:
+    /authorization/sign_up:
+        post:
+            tags:
+                - Authorization
+            summary: "Register a new account"
+            description: ""
+            consumes:
+                - "application/json"
+            parameters:
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestRegister"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /authorization/login:
+        post:
+            tags:
+                - Authorization
+            summary: "Login"
+            description: ""
+            consumes:
+                - "application/json"
+            parameters:
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestLogin"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseLogin"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /authorization/authorize:
+        post:
+            tags:
+                - Authorization
+            summary: Get access token or refesh access token
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Basic {client_id:client_secret} in base64
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestAuthorize"
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        $ref: "#/definitions/ResponseAuthorize"
+                400:
+                    description: "Bad request"
+                    schema:
+                        type: object
+                        properties:
+                            error:
+                                type: string
+                                example: invalid_request
+                            error_description:
+                                type: string
+                                example: Client secret is not match
+                500:
+                    description: "Internal server error"
+                    schema:
+                        type: object
+                        properties:
+                            error:
+                                type: string
+                                example: server_error
+                            error_description:
+                                type: string
+                                example: OOps!! Something wrong
+
+    /authorization/logout:
+        post:
+            tags:
+                - Authorization
+            summary: "Logout"
+            description: ""
+            consumes:
+                - "application/json"
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseLogout"
+                401:
+                    description: "Unauthorized"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /accounts/limit_info:
+        get:
+            tags:
+                - Account
+            summary: Get account info
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseLimitInfo"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /accounts/g/reset_password:
+        get:
+            tags:
+                - Account
+            summary: Request to reset user's password, it will send verify code to user
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: query
+                  name: account
+                  description: The account of request to reset password(email format)
+                  required: true
+                  type: string
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        post:
+            tags:
+                - Account
+            summary: Confirm to reset user's password
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: body
+                  name: body
+                  schema:
+                      type: object
+                      properties:
+                          account:
+                              type: string
+                              description: The account (email format)
+                          nPassword:
+                              type: string
+                              description: The new password
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /accounts/g/resend:
+        get:
+            tags:
+                - Account
+            summary: Request to resend verification email by account
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: query
+                  name: type
+                  type: string
+                  description: The type of request to resend, "a" for unverified account, "p" for reset password
+                  required: true
+                - in: query
+                  name: account
+                  type: string
+                  description: The email of request to resend
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /accounts/g/verify:
+        get:
+            tags:
+                - Account
+            summary: Verify code to reset password
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: query
+                  name: type
+                  type: string
+                  description: The type of request, "p" for reset password
+                  required: true
+                - in: query
+                  name: account
+                  type: string
+                  description: The email of request
+                  required: true
+                - in: query
+                  name: code
+                  type: string
+                  description: The code for verifing
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /accounts/g/change_password:
+        patch:
+            tags:
+                - Account
+            summary: Change user's password
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  schema:
+                      type: object
+                      properties:
+                          openId:
+                              type: string
+                              description: The unique id of account
+                          oPassword:
+                              type: string
+                              description: The original password
+                          nPassword:
+                              type: string
+                              description: The new password
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /accounts/g/recover:
+        get:
+            tags:
+                - Account
+            summary: Request to recover account (Not implemented)
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: query
+                  name: account
+                  type: string
+                  description: The email of account
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        post:
+            tags:
+                - Account
+            summary: Confirm to recover account (Not implemented)
+            description: ""
+            consumes:
+                - "application/json"
+            parameters:
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestLogin"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /accounts/{openId}:
+        post:
+            tags:
+                - Account
+            summary: Update account profile by account Id
+            description: ""
+            consumes:
+                - multipart/form-data
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: openId
+                  type: string
+                  description: The unique id of account
+                  required: true
+                - in: formData
+                  name: avatar
+                  type: file
+                  description: The avatar file of account
+                - in: formData
+                  name: name
+                  required: true
+                  type: string
+                  description: The name of account
+                - in: formData
+                  name: birthday
+                  type: string
+                  required: true
+                  format: date
+                  description: The birthday of account
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        delete:
+            tags:
+                - Account
+            deprecated: true
+            summary: Delete account by account Id (not complete)
+            description: Not implemented
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: openId
+                  type: string
+                  description: The unique id of account
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseDeleteAccount"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /accounts/{openId}/avatar:
+        get:
+            tags:
+                - Account
+            summary: Download account's headshot
+            description: ""
+            produces:
+                - image/png
+                - image/gif
+                - image/jpeg
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: openId
+                  type: string
+                  description: The unique id of account
+                  required: true
+            responses:
+                200:
+                    description: Success
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /accounts/d/{accountId}:
+        get:
+            tags:
+                - Account
+            summary: Request to delete account
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: accountId
+                  type: string
+                  description: The identifier of account
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        delete:
+            tags:
+                - Account
+            summary: Confirm to delete account
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: accountId
+                  type: string
+                  description: The identifier of account
+                  required: true
+                - in: query
+                  name: code
+                  type: string
+                  description: Verify code
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /storages/o:
+        post:
+            tags:
+                - Storage
+            summary: Upload file
+            consumes:
+                - multipart/form-data
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: formData
+                  name: openId
+                  type: string
+                  description: The unique id of account
+                - in: formData
+                  name: photo
+                  type: file
+                  required: true
+                  description: The file of photo
+                - in: formData
+                  name: babyId
+                  type: string
+                  required: true
+                  description: The unique id of baby
+                - in: formData
+                  name: category
+                  type: string
+                  required: true
+                  enum: ["g"]
+                  description: File category (g=common, only app usege)
+                - in: formData
+                  name: takeTime
+                  type: number
+                  required: true
+                  description: The photo take time in millis, using GMT+0
+                - in: formData
+                  name: offset
+                  type: string
+                  required: true
+                  description: The offset, for example, +09:00
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseUploadFile"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        patch:
+            tags:
+                - Storage
+            summary: Hide/show files
+            description: Not implemented
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          fids:
+                              type: array
+                              items:
+                                  type: string
+                                  description: fid to be hide/show
+                          hide:
+                              type: boolean
+                              description: Hide photos or not
+                              enum: [true, false]
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /storages/od:
+        post:
+            tags:
+                - Storage
+            summary: Upload file by device
+            consumes:
+                - multipart/form-data
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: formData
+                  name: openId
+                  type: string
+                  description: The unique id of account
+                - in: formData
+                  name: photo
+                  type: file
+                  required: true
+                  description: The file of photo
+                - in: formData
+                  name: babyId
+                  type: string
+                  required: true
+                  description: The unique id of baby
+                - in: formData
+                  name: category
+                  type: string
+                  required: true
+                  enum: ["s", "c", "d"]
+                  description: File category (s=smile, c=cry, d=daily)
+                - in: formData
+                  name: detectInfo
+                  description: The detect info
+                  required: true
+                  type: "string"
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /storages/ov:
+        post:
+            tags:
+                - Storage
+            summary: Upload video file (Only for app)
+            description: ""
+            consumes:
+                - multipart/form-data
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: formData
+                  name: openId
+                  type: string
+                  required: true
+                  description: The unique id of account
+                - in: formData
+                  name: avatar
+                  type: file
+                  required: true
+                  description: The file of video. (mp4)
+                - in: formData
+                  name: thumbnail
+                  type: file
+                  required: true
+                  description: The thumbnail file of video. (jpeg)
+                - in: formData
+                  name: babyId
+                  type: string
+                  required: true
+                  description: The unique id of baby
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /storages/o/{fid}:
+        get:
+            tags:
+                - Storage
+            summary: Download file by file id
+            description: ""
+            produces:
+                - image/png
+                - image/gif
+                - image/jpeg
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: fid
+                  type: string
+                  description: The unique id of file
+                  required: true
+                - in: query
+                  name: type
+                  type: integer
+                  enum: [1, 2]
+                  description: The download file type (1 = compressed 2 = thumbnail)
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: file
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        patch:
+            tags:
+                - Storage
+            summary: Add/Edit note of photo
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: fid
+                  type: string
+                  description: The unique id of file
+                  required: true
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestNote"
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseUploadFile"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        delete:
+            tags:
+                - Storage
+            summary: Delete file by file id
+            description: ""
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: fid
+                  type: string
+                  description: The unique id of file
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+    /storages/d/{accountId}:
+        get:
+            tags:
+                - Storage
+            summary: Request to package all files by account id
+            description: ""
+            produces:
+                - image/png
+                - image/gif
+                - image/jpeg
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: accountId
+                  type: string
+                  description: The id of account
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: file
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /storages/s/{babyId}:
+        get:
+            tags:
+                - Storage
+            summary: Synchronize files
+            description: ""
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: babyId
+                  type: string
+                  required: true
+                  description: The unique id of baby
+                - in: query
+                  name: sdt
+                  type: integer
+                  required: true
+                  description: |
+                      The timestamp(mill seconds) of start time.
+                - in: query
+                  name: first_sync
+                  type: boolean
+                  required: true
+                  description: Identify that request is first time to sync medias
+                - in: query
+                  name: skip
+                  type: integer
+                  description: The numbers of skip, default to 0
+                - in: query
+                  name: take
+                  type: integer
+                  description: The numbers to take, default to 0
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseSyncFiles"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /relationships:
+        get:
+            tags:
+                - Others
+            summary: Get all defined relationships to pick
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: header
+                  name: accept-language
+                  type: string
+                  description: The locale, if empty, server will set default value to en-us
+                  enum:
+                      - zh-TW
+                      - en-US
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseNameValuePairs"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /babies:
+        post:
+            tags:
+                - Baby
+            summary: Create a baby profile
+            description: ""
+            consumes:
+                - multipart/form-data
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: formData
+                  name: openId
+                  type: string
+                  required: true
+                  description: The unique id of account
+                - in: formData
+                  name: avatar
+                  type: file
+                  description: The avatar file of baby
+                - in: formData
+                  name: name
+                  required: true
+                  type: string
+                  description: The name of baby
+                - in: formData
+                  name: birthday
+                  type: string
+                  format: date
+                  required: true
+                  description: The birthday of baby
+                - in: formData
+                  name: gender
+                  type: integer
+                  enum: [0, 1]
+                  required: true
+                  description: The gender id of baby (0 = boy, 1 = girl)
+                - in: formData
+                  name: relationship
+                  type: string
+                  required: true
+                  description: The relationship of baby
+                - in: formData
+                  name: nation
+                  type: string
+                  required: true
+                  description: The nation of baby. e.g TW
+                - in: formData
+                  name: isBirthday
+                  type: boolean
+                  description: Identity the input date is birthday
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseCreateBaby"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        get:
+            tags:
+                - Baby
+            summary: List babies with account id
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: "query"
+                  name: "openid"
+                  type: string
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseListBabies"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /babies/{babyId}:
+        post:
+            tags:
+                - Baby
+            summary: Update baby profile
+            description: ""
+            consumes:
+                - multipart/form-data
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: babyId
+                  type: string
+                  description: The unique id of baby
+                  required: true
+                - in: formData
+                  name: openId
+                  type: string
+                  required: true
+                  description: The unique id of account
+                - in: formData
+                  name: avatar
+                  type: file
+                  description: The avatar file of baby
+                - in: formData
+                  name: name
+                  required: true
+                  type: string
+                  description: The name of baby
+                - in: formData
+                  name: birthday
+                  type: string
+                  format: date
+                  required: true
+                  description: The birthday of baby
+                - in: formData
+                  name: gender
+                  type: integer
+                  enum: [0, 1]
+                  required: true
+                  description: The gender id of baby (0 = boy, 1 = girl)
+                - in: formData
+                  name: relationship
+                  type: string
+                  required: true
+                  description: The relationship of baby
+                - in: formData
+                  name: nation
+                  type: string
+                  required: true
+                  description: The country name of baby
+                - in: formData
+                  name: isBirthday
+                  type: boolean
+                  description: Identity the input date is birthday
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseCreateBaby"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /babies/d/{babyId}:
+        get:
+            tags:
+                - Baby
+            summary: Request to delete baby
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: babyId
+                  type: string
+                  description: The unique id of baby
+                  required: true
+                - in: query
+                  name: openid
+                  type: string
+                  description: The id of account
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        delete:
+            tags:
+                - Baby
+            summary: Confirm to delete baby
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: babyId
+                  type: string
+                  description: The unique id of baby
+                  required: true
+                - in: query
+                  name: openid
+                  type: string
+                  description: The id of account
+                  required: true
+                - in: query
+                  name: code
+                  type: string
+                  description: The verify code
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+    /pairing:
+        get:
+            tags:
+                - Device
+            summary: Request to pair device
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: babyid
+                  description: The baby's identifier
+                  required: true
+                  type: string
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                type: string
+                                example: Pairing key
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        post:
+            tags:
+                - Device
+            summary: Complete pairing device
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Basic {client_id:client_secret} in base64
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestPairDevice"
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponsePairDevice"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /pairing/{pairingKey}/status:
+        get:
+            tags:
+                - Device
+            summary: Checking status of pairing, response UID if succeed
+            description:
+                It is pairing fail if response with 4xx or 5xx status code, there will be two situations with 2xx status code
+                1. Response.result is an empty string, it means that pairing is not completed yet, polling again.
+                2. Response.result is not an empty string, that is UID.
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: pairingKey
+                  type: string
+                  required: true
+                  description: Pairing key
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                type: string
+                                example: UID
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /devices:
+        get:
+            tags:
+                - Device
+            summary: Get all devices by baby id
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: babyid
+                  description: The unique id of baby
+                  required: true
+                  type: string
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseDeviceList"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        post:
+            tags:
+                - Device
+            deprecated: true
+            responses:
+                "503":
+                    description: Not implemented
+
+    /devices/{deviceId}:
+        delete:
+            tags:
+                - Device
+            summary: Disconnect with baby
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: deviceId
+                  description: The unique id of paired device
+                  type: string
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                type: object
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        patch:
+            tags:
+                - Device
+            summary: Update device location and timezone
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: deviceId
+                  type: string
+                  description: The unique id of paired device
+                  required: true
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestUpdateDevice"
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                type: object
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /device_locations:
+        get:
+            tags:
+                - Others
+            summary: Get all defined device locations to pick
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: header
+                  name: accept-language
+                  type: string
+                  description: The locale, if empty, server will set default value to en-us
+                  enum:
+                      - zh-TW
+                      - en-US
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseNameValuePairs"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /countries:
+        get:
+            tags:
+                - Others
+            summary: Get all countries to pick
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: header
+                  name: accept-language
+                  type: string
+                  description: The locale, if empty, server will set default value to en-us
+                  enum:
+                      - zh-TW
+                      - en-US
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseNameValuePairs"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /timezones:
+        get:
+            tags:
+                - Others
+            summary: Get all timezones to pick
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: header
+                  name: accept-language
+                  type: string
+                  description: The locale, if empty, server will set default value to en-us
+                  enum:
+                      - zh-TW
+                      - en-US
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseNameValuePairs"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /event_histories:
+        post:
+            tags:
+                - Events
+            summary: Add event(exclude crying event)
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestAddEvent"
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                type: object
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        get:
+            tags:
+                - Events
+            summary: Get events by date range
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: babyid
+                  type: string
+                  required: true
+                  description: Unique id of baby
+                - in: query
+                  name: sdt
+                  type: number
+                  required: true
+                  description: Start datetime (timestamp)
+                - in: query
+                  name: edt
+                  type: number
+                  description: End datetime (timestamp), optional
+                - in: query
+                  name: ct
+                  type: string
+                  enum: ["e", "c", "t", "h"]
+                  description: Optional, for filtering by event category. Without this parameter, all categories would be included. (e=e-fence,c=cry,t=temperature,h=humidity)
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseEventList"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /event_histories/c:
+        post:
+            tags:
+                - Events
+            summary: Crying recognize
+            description: ""
+            consumes:
+                - multipart/form-data
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: formData
+                  name: babyId
+                  type: string
+                  required: true
+                  description: Unique id of baby
+                - in: formData
+                  name: sn
+                  type: string
+                  required: true
+                  description: Serial number of device
+                - in: formData
+                  name: file
+                  type: file
+                  required: true
+                  description: The file of voice wav
+                - in: formData
+                  name: temperature
+                  type: string
+                  required: true
+                  description: The temperature
+                - in: formData
+                  name: humidity
+                  type: string
+                  required: true
+                  description: The humidity
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                type: object
+                                properties:
+                                    isCry:
+                                        type: boolean
+                                        description: Baby id crying or not
+                                    testResult:
+                                        type: string
+                                        description: Original test result from emorec
+                                        example: 0@[9.3914318e-01 7.2440315e-07 4.2886545e-12 6.0856156e-02]
+                                    eid:
+                                        type: string
+                                        description: Event id, it will be empty when isCry being false
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        get:
+            tags:
+                - Events
+            summary: Find one crying event by event id or find one latest crying event with baby id
+            description: If query parameters with both "babyid" and "eid", service would find the latest crying event first
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: eid
+                  description: Event id
+                  type: string
+                - in: query
+                  name: babyid
+                  description: Baby id. ** With this parameter, system will search for the latest event of crying. **
+                  type: string
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseOneEvent"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /event_histories/c/{eid}:
+        patch:
+            tags:
+                - Events
+            summary: Correct recognized result of crying
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: eid
+                  description: Event id
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  description: Correct value of labeling(1=no cry, 2=wet diaper, 3=hunger, 4=painful, 5=sleepy)
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          correct_label:
+                              type: number
+                              enum: [1, 2, 3, 4, 5]
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: object
+                        properties:
+                            code:
+                                type: integer
+                                format: Int32
+                            message:
+                                type: string
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /members:
+        delete:
+            tags:
+                - Member
+            summary: Un follow a baby / remove a member
+            description: Not implemented
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: openid
+                  type: string
+                  description: The account's identifier
+                  required: true
+                - in: query
+                  name: babyid
+                  type: string
+                  required: true
+                  description: The baby's identifier.
+                - in: query
+                  name: inviteeid
+                  type: string
+                  description: Optional, the member's identifier. ** if this field is empty, this action will be un follow a baby, otherwise, to remove a member. **
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        get:
+            tags:
+                - Member
+            summary: Query members of baby
+            description: Not implemented
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: babyid
+                  type: string
+                  required: true
+                  description: The baby's identifier.
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseListMemberByBaby"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /members/g/invitations:
+        get:
+            tags:
+                - Member
+            summary: Query invitations that not comfirmed yet
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: openid
+                  type: string
+                  description: The account's identifier
+                  required: true
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseInvitationList"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        put:
+            tags:
+                - Member
+            summary: Accept or reject invitation
+            description: Not implemented
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestAcceptInvitation"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        post:
+            tags:
+                - Member
+            summary: Invite or re-invite member
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestInvite"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /members/g/permissions:
+        get:
+            tags:
+                - Member
+            summary: Query invitations that not comfirmed yet
+            description: Not implemented
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: openid
+                  type: string
+                  description: The account's identifier
+                  required: true
+                - in: query
+                  name: babyid
+                  type: string
+                  description: Optional, the baby's identifier.
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponsePermissionList"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        put:
+            tags:
+                - Member
+            summary: Create / update member's permissions
+            description: Not implemented
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestPutPermissions"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /special_cards/o:
+        get:
+            tags:
+                - Special card
+            summary: Query special cards by baby
+            description: To find all special cards belong to baby
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: babyid
+                  type: string
+                  required: true
+                  description: Optional, the baby's identifier.
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseCardList"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        post:
+            tags:
+                - Special card
+            summary: Create new special card
+            description: To create one special card for baby
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestCreateCard"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseCardInfo"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /special_cards/o/{cardId}:
+        patch:
+            tags:
+                - Special card
+            summary: Update an existed special card
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: cardId
+                  type: string
+                  description: The unique identifier of special card
+                  required: true
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestUpdateCard"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseCardInfo"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        delete:
+            tags:
+                - Special card
+            summary: Delete one special card, all types of card could be removed when developing
+            description: ""
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: cardId
+                  type: string
+                  description: The unique identifier of special card
+                  required: true
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /special_cards/covers:
+        get:
+            tags:
+                - Special card
+            deprecated: true
+            summary: Get all covers
+            description: Not implemented
+            responses:
+                "501":
+                    description: Not Implemented
+
+    /special_cards/covers/{coverId}:
+        get:
+            tags:
+                - Special card
+            deprecated: true
+            summary: Download file by cover id
+            description: Not implemented
+            produces:
+                - image/png
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: coverId
+                  type: string
+                  description: The unique identifier of cover
+                  required: true
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: file
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /cases/o:
+        get:
+            tags:
+                - Subscriptions
+            summary: Query avaliable cases
+            description: ""
+            produces:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: code
+                  type: string
+                  required: true
+                  enum:
+                      - TW
+                      - US
+                  description: To find out avaliable cases by different country code
+                - in: query
+                  name: target
+                  type: string
+                  enum:
+                      - official
+                  description: For official website using only
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseCaseList"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /cases/p:
+        get:
+            tags:
+                - Subscriptions
+            summary: Download image of case
+            description: ""
+            produces:
+                - image/jpeg
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: fid
+                  type: string
+                  required: true
+                  description: The unique identifier of file
+            responses:
+                200:
+                    description: Success
+                    schema:
+                        type: file
+                400:
+                    description: Bad request
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: Internal server error
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /purchases/v/{target}:
+        put:
+            tags:
+                - Subscriptions
+            summary: Verify receipt
+            description: |
+
+                To verify receipt which respond from third party like app store, google play...
+                For apple >> payload = default response from app store
+                For google >> payload = The value of "purchaseToken" field respond from google
+                For official website >> payload = The value of "MerchantTradeNo" field respond from greenland
+
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: target
+                  type: string
+                  description: The target to verify
+                  enum:
+                      - apple
+                      - google
+                      - official
+                  required: true
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/RequestVerifyReceipt"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+        post:
+            tags:
+                - Subscriptions
+            summary: Cancellation of purchase (Official website only)
+            description: To cancel one purchase from official website
+            consumes:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: path
+                  name: target
+                  type: string
+                  description: Target store
+                  required: true
+                - in: "body"
+                  name: "body"
+                  required: true
+                  schema:
+                      type: "object"
+                      properties:
+                          openId:
+                              type: "string"
+                          pid:
+                              type: "string"
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseRegister"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+    /purchases/o:
+        get:
+            tags:
+                - Subscriptions
+            summary: Query purchases by baby or account
+            description: |
+                If both babyid and accountid are given, system will find results by account.
+            produces:
+                - application/json
+            parameters:
+                - in: header
+                  name: authorization
+                  description: Bearer {access token}
+                  required: true
+                  type: string
+                - in: query
+                  name: babyid
+                  type: string
+                  description: The unique identifier of baby
+                - in: query
+                  name: accountid
+                  type: string
+                  description: The unique identifier of account
+            responses:
+                200:
+                    description: "Success"
+                    schema:
+                        type: "object"
+                        properties:
+                            code:
+                                type: "integer"
+                                format: "Int32"
+                            message:
+                                type: "string"
+                            result:
+                                $ref: "#/definitions/ResponseQueryPurchase"
+                400:
+                    description: "Bad request"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+                500:
+                    description: "Internal server error"
+                    schema:
+                        $ref: "#/definitions/ErrorResponse"
+
+# definitions
+definitions:
+    ErrorResponse:
+        type: "object"
+        properties:
+            code:
+                type: "integer"
+                example: "10001"
+            message:
+                type: "string"
+                example: "OOps!! Something wrong"
+    RequestHeaderBearer:
+        type: "string"
+        example: "Bearer {access token}"
+    RequestRegister:
+        type: "object"
+        required:
+            - account
+            - password
+        properties:
+            account:
+                type: "string"
+                format: "email"
+            password:
+                type: "string"
+                format: "password"
+    ResponseRegister:
+        type: "object"
+    RequestLogin:
+        type: "object"
+        required:
+            - account
+            - password
+        properties:
+            account:
+                type: "string"
+                format: "email"
+            password:
+                type: "string"
+                format: "password"
+    ResponseLogin:
+        type: "object"
+        properties:
+            code:
+                type: "string"
+    ResponseLogout:
+        type: "string"
+        example: "Logout done"
+    RequestAuthorize:
+        type: object
+        required:
+            - grant_type
+        properties:
+            code:
+                type: string
+                description: User's grant code, can not be empty if the grant_type being "authorization_code"
+            refresh_token:
+                type: string
+                description: Refresh token, can not be empty if the grant_type being "refresh_token"
+            grant_type:
+                type: string
+                description: Could be "authorization_code" or "refresh_token"
+    ResponseAuthorize:
+        type: object
+        properties:
+            access_token:
+                type: string
+                description: The token for accessing resource
+            token_type:
+                type: string
+                example: bearer
+                description: The type of access token, always be bearer
+            expires_in:
+                type: integer
+                example: 86400
+                description: The expires duration in seconds
+            refresh_token:
+                type: string
+                description: The token for refresh
+            scope:
+                type: string
+                example: email name
+                description: The scope of resource can be accessed
+    ResponseLimitInfo:
+        type: object
+        properties:
+            email:
+                type: string
+                format: email
+                description: User's identity, must be an e-mail
+            openId:
+                type: string
+                description: The unique id of account
+            birthday:
+                type: string
+                format: date
+                description: The birthday of account
+            name:
+                type: string
+                description: The name of account
+            avatar:
+                type: string
+                description: The avatar file id of account
+    ResponseUpdateAccount:
+        type: object
+    ResponseDeleteAccount:
+        type: object
+    ResponseUploadFile:
+        type: object
+        properties:
+            fid:
+                type: string
+                example: "NDA5MDhlY2QtOTBlZS00ZDc2LThlN2MtZmM3ODIwOTk5Mjcw"
+                description: The unique id of file
+            accountId:
+                type: string
+                description: Owner id
+            babyId:
+                type: string
+                example: "NDA5MDhlY2QtOTBlZS00ZDc2LThlN2MtZmM3ODIwOTk5Mjcw"
+                description: The unique id of baby
+            fileType:
+                type: number
+                description: File type. (0 = photo, 1 = video)
+            fileName:
+                type: string
+                example: "YTJkYjcxOGItNzRhYS00ZDg4LTk3NjMtYzNlZDFmOGFiZjlh.jpeg"
+            fileSize:
+                type: number
+                format: integer
+                example: 21417
+            fileStatus:
+                type: number
+                enum: [0, 1]
+                description: The process status of photo (0 = processing, 1 = done)
+            note:
+                type: string
+                example: "I am note"
+                description: The note of file
+            valid:
+                type: boolean
+                example: false
+                description: Identify the file be deleted or not
+            photoDateTime:
+                type: number
+                format: integer
+                example: 15393367417
+                description: The timestamp of photo taked
+            latitude:
+                type: number
+                format: integer
+                example: 21.3893737417
+                description: The latitude of photo taked
+            longitude:
+                type: number
+                format: integer
+                example: 21.413038737
+                description: The longitude of photo taked
+            updatedAt:
+                type: number
+                format: integer
+                example: 15393367417
+                description: The update timestamp of photo
+            hidden:
+                type: boolean
+                description: Flag of visibility
+            isDeviceUploaded:
+                type: boolean
+                description: File is uploaded by device
+    ResponseDeleteFile:
+        type: object
+        properties:
+            fid:
+                type: string
+                example: "NDA5MDhlY2QtOTBlZS00ZDc2LThlN2MtZmM3ODIwOTk5Mjcw"
+    ResponseSyncFiles:
+        type: object
+        properties:
+            latestSync:
+                type: integer
+                example: 1559542528317
+                description: The timestamp for next time sync
+            data:
+                type: array
+                items:
+                    type: object
+                    properties:
+                        fid:
+                            type: string
+                        accountId:
+                            type: string
+                            description: Owner id of file
+                        babyId:
+                            type: string
+                            example: "ajdbkuwheifeuwrbfewfiubddd"
+                        fileType:
+                            type: number
+                            description: File type (0 = photo, 1 = video)
+                        fileName:
+                            type: string
+                            example: "YTJkYjcxOGItNzRhYS00ZDg4LTk3NjMtYzNlZDFmOGFiZjlh.jpeg"
+                        fileSize:
+                            type: number
+                            format: integer
+                            example: 21417
+                        fileStatus:
+                            type: integer
+                            enum: [0, 1]
+                            description: The process status of photo (0 = processing, 1 = process done)
+                        note:
+                            type: string
+                            example: "I am note"
+                        valid:
+                            type: boolean
+                            description: To recognize the photo is valid or not
+                        photoDateTime:
+                            type: number
+                            format: integer
+                            example: 2141720293991
+                            description: The timestamp of photo taked
+                        latitude:
+                            type: number
+                            example: 21.0928417
+                            description: The latitude of photo taked
+                        longitude:
+                            type: number
+                            example: 21.0228417
+                            description: The longitude of photo taked
+                        updatedAt:
+                            type: number
+                            format: integer
+                            example: 2141720293991
+                            description: The update time of photo
+                        hidden:
+                            type: boolean
+                            description: Flag of visibility
+                        isDeviceUploaded:
+                            type: boolean
+                            description: File is uploaded from device
+            leftCount:
+                type: number
+                format: integer
+                description: There are still left files to sync
+    ResponseGetAvailableUID:
+        type: object
+        properties:
+            uid:
+                type: string
+    ResponsePicker:
+        type: array
+        items:
+            type: string
+    ResponseCreateBaby:
+        type: object
+        properties:
+            babyId:
+                type: string
+                description: The unique id of baby
+            birthday:
+                type: string
+                format: date
+                description: The birthday of baby
+            gender:
+                type: integer
+                enum: [0, 1]
+                description: The gender id of baby (0 = boy, 1 = girl)
+            name:
+                type: string
+                description: The name of baby
+            nation:
+                type: string
+                description: The nation of baby
+            avatar:
+                type: string
+                description: The avatar file id of baby
+            memberId:
+                type: string
+                description: The unique id of member
+            isBirthday:
+                type: boolean
+    RequestListBabies:
+        type: object
+        properties:
+            openId:
+                type: string
+                description: The unique id of account
+    ResponseListBabies:
+        type: array
+        items:
+            type: object
+            properties:
+                babyId:
+                    type: string
+                    description: The unique id of baby
+                birthday:
+                    type: string
+                    format: date
+                    description: The birthday of baby
+                gender:
+                    type: integer
+                    enum: [0, 1]
+                    description: The gender id of baby (0 = boy, 1 = girl)
+                name:
+                    type: string
+                    description: The name of baby
+                nation:
+                    type: string
+                    description: The nation of baby
+                avatar:
+                    type: string
+                    description: The avatar file id of baby
+                relationship:
+                    type: string
+                    description: The relationship of baby
+                role:
+                    type: integer
+                    enum: [0, 1]
+                    description: The role of member (0 = admin, 1 = guest)
+                isBirthday:
+                    type: boolean
+                subscribed:
+                    type: boolean
+                    description: Identify baby has subscribed or not
+    ResponseListAdminBabies:
+        type: array
+        items:
+            type: object
+            properties:
+                babyId:
+                    type: string
+                    description: The unique id of baby
+                birthday:
+                    type: string
+                    format: date
+                    description: The birthday of baby
+                gender:
+                    type: integer
+                    enum: [0, 1]
+                    description: The gender id of baby (0 = boy, 1 = girl)
+                name:
+                    type: string
+                    description: The name of baby
+                nation:
+                    type: string
+                    description: The nation of baby
+                avatar:
+                    type: string
+                    description: The avatar file id of baby
+    RequestDeleteBaby:
+        type: object
+        properties:
+            openId:
+                type: string
+                description: The unique id of account
+    RequestPairDevice:
+        type: object
+        properties:
+            # openId:
+            #     type: string
+            #     description: The unique id of account
+            # babyId:
+            #     type: string
+            #     description: The unique id of baby
+            pairingKey:
+                type: string
+                description: Pairing key
+            sn:
+                type: string
+                description: The serial number of device
+            # uid:
+            #     type: string
+            #     description: The UID of device
+            mac:
+                type: string
+                description: The mac address of device
+            swVer:
+                type: string
+                description: The software version of device
+            aiVer:
+                type: string
+                description: The ai version of device
+            timezone:
+                type: string
+                description: The timezone name of device
+                example: America/Anchorage
+    ResponsePairDevice:
+        type: object
+        properties:
+            babyId:
+                type: string
+                description: The unique id of baby
+            uid:
+                type: string
+                description: The UID of device
+    ResponseListMemberByBaby:
+        type: array
+        items:
+            type: object
+            properties:
+                accountId:
+                    type: string
+                    description: The unique id of account
+                email:
+                    type: string
+                    description: The mail address of account
+                name:
+                    type: string
+                    description: The name of user
+                avatar:
+                    type: string
+                    description: The headshot of account
+                relationship:
+                    type: string
+                    description: The relationship of baby
+                status:
+                    type: integer
+                    enum: [0, 1, 2]
+                    description: The status of member (0 = inviting, 1 = accepted, 2 = rejected)
+    ResponseFamilyList:
+        type: array
+        items:
+            type: object
+            properties:
+                accountId:
+                    type: string
+                    description: The unique id of account
+                email:
+                    type: string
+                    format: email
+                    description: The email of account
+                name:
+                    type: string
+                    description: The name of account
+                birthday:
+                    type: string
+                    format: date
+                    description: The birthday of account
+                avatar:
+                    type: string
+                    description: The unique id of account avatar
+    RequestDeleteMember:
+        type: object
+        properties:
+            openId:
+                type: string
+                description: The unique id of account
+            babyId:
+                type: string
+                description: The unique id of baby
+    ResponseDeleteMember:
+        type: object
+    RequestCreateEventHistory:
+        type: object
+        properties:
+            uid:
+                type: string
+                description: The UID of device
+            eventCode:
+                type: string
+                description: The unique code of event
+            eventTime:
+                type: string
+                description: The timestamp of event to retrieve the event video
+            eventMessage:
+                type: string
+                description: The message of event
+    ResponseCreateEventHistory:
+        type: object
+    ResponseEventHistoryList:
+        type: array
+        items:
+            type: object
+            properties:
+                eventCode:
+                    type: string
+                    description: The unique code of event
+                eventTime:
+                    type: string
+                    description: The timestamp of event to retrieve the event video
+                eventMessage:
+                    type: string
+                    description: The message of event
+                createAt:
+                    type: string
+                    description: The create time of event
+    ResponseDeviceList:
+        type: array
+        items:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                    description: The unique id of device generate by system
+                uid:
+                    type: string
+                    description: The unique id of device generate by TUTK
+                # mac:
+                #     type: string
+                #     description: The mac address of device
+                sn:
+                    type: string
+                    description: Serial number of device
+                swVersion:
+                    type: string
+                    description: The software version of device
+                aiVersion:
+                    type: string
+                    description: The AI version of device
+                timezone:
+                    type: string
+                    description: The timezone of device
+                locationName:
+                    type: string
+                    description: The location name of device
+                deviceModel:
+                    type: string
+                    description: Model of device
+                deviceName:
+                    type: string
+                    description: Name of device
+    RequestNote:
+        type: object
+        required:
+            - note
+        properties:
+            note:
+                type: string
+                example: I am note
+                description: Note of photo
+    ResponseNameValuePairs:
+        type: array
+        items:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Key name of item
+                value:
+                    type: string
+                    description: Key value of item
+    ResponseEventList:
+        type: array
+        items:
+            type: object
+            properties:
+                eid:
+                    type: string
+                    description: Event id
+                category:
+                    type: string
+                    enum: ["e", "c", "t", "h"]
+                    description: Event type. (e=e-fence, c=cry, t=temperature, h=humidity)
+                eventTime:
+                    type: integer
+                    description: Event time
+                eventMessage:
+                    type: string
+                    description: Event message
+                temperature:
+                    type: string
+                    description: Temperature while event happened
+                humidity:
+                    type: string
+                    description: Humidity while event happened
+                cryingTest:
+                    type: object
+                    description: Optional, if event category being "c", it would be shown
+                    properties:
+                        label:
+                            type: integer
+                            description: The original label of recognized result
+                        result:
+                            type: array
+                            items:
+                                type: number
+                                description: The recognize result list
+                                example: [0.9, 0.4, 0.3, 0.1]
+                        feedbackLabel:
+                            type: integer
+                            description: Label of user feedback
+
+    ResponseOneEvent:
+        type: object
+        properties:
+            eid:
+                type: string
+                description: Event id
+            category:
+                type: string
+                enum: ["e", "c", "t", "h"]
+                description: Event type. (e=e-fence, c=cry, t=temperature, h=humidity)
+            eventTime:
+                type: integer
+                description: Event time
+            eventMessage:
+                type: string
+                description: Event message
+            temperature:
+                type: string
+                description: Temperature while event happened
+            humidity:
+                type: string
+                description: Humidity while event happened
+            cryingTest:
+                type: object
+                description: Optional, if event category being "c", it would be shown
+                properties:
+                    label:
+                        type: integer
+                        description: The original label of recognized result
+                    results:
+                        type: array
+                        items:
+                            type: number
+                            description: The recognize result list
+                        example: [0.9, 0.4, 0.3, 0.1]
+                    feedbackLabel:
+                        type: integer
+                        description: Label of user feedback
+
+    RequestAddEvent:
+        type: object
+        properties:
+            sn:
+                type: string
+                description: Serial number of device
+            category:
+                type: string
+                enum: ["e", "t", "h"]
+                description: Event type. (e=e-fence, t=temperature, h=humidity)
+            eventTime:
+                type: integer
+                description: Event time, timestamp
+            eventMessage:
+                type: string
+                description: Event message
+            temperature:
+                type: string
+                description: Temperature while event happened
+            humidity:
+                type: string
+                description: Humidity while event happened
+    RequestInvite:
+        type: object
+        properties:
+            openId:
+                type: string
+                description: The inviter's identifier
+            babyId:
+                type: string
+                description: The baby's identifier
+            email:
+                type: string
+                description: The invitee's mail address
+            relationship:
+                type: string
+                description: The relationship of invitee
+    ResponseInvitationList:
+        type: array
+        items:
+            type: object
+            properties:
+                taskId:
+                    type: string
+                    description: The invitation task identifier
+                inviterName:
+                    type: string
+                    description: The inviter's name
+                babyName:
+                    type: string
+                    description: The baby's name
+    RequestAcceptInvitation:
+        type: object
+        properties:
+            openId:
+                type: string
+                description: The invitee's identifier
+            taskId:
+                type: string
+                description: The invitation task identifier
+            accepted:
+                type: boolean
+                description: Accept or not
+    ResponsePermissionList:
+        type: array
+        items:
+            type: object
+            properties:
+                babyId:
+                    type: string
+                    description: The baby's identifier
+                allowFamilyAlbum:
+                    type: boolean
+                    description: Permission of family album
+                viewPrivatePictures:
+                    type: boolean
+                    description: Permission of viewing private photos
+                specialCardEdit:
+                    type: boolean
+                    description: Permission of create/edit special cards
+                devices:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            deviceId:
+                                type: string
+                                description: The device's identifier
+                            allowStreaming:
+                                type: boolean
+                                description: Enable live streaming or not
+                            allowTwoWayTalk:
+                                type: boolean
+                                description: Enable two way talk or not
+                            allowContentPlaying:
+                                type: boolean
+                                description: Enable content playing or not
+                            allowPlayback:
+                                type: boolean
+                                description: Enable playback or not
+    RequestPutPermissions:
+        type: object
+        properties:
+            openId:
+                type: string
+                description: Admin's identifier
+            babyId:
+                type: string
+                description: The baby's identifier
+            memberId:
+                type: string
+                description: Member's identifier
+            allowFamilyAlbum:
+                type: boolean
+                description: Permission of family album
+            viewPrivatePictures:
+                type: boolean
+                description: Permission of viewing private photos
+            specialCardEdit:
+                type: boolean
+                description: Permission of create/edit special cards
+            devices:
+                type: array
+                items:
+                    type: object
+                    properties:
+                        deviceId:
+                            type: string
+                            description: The device's identifier
+                        allowStreaming:
+                            type: boolean
+                            description: Enable live streaming or not
+                        allowTwoWayTalk:
+                            type: boolean
+                            description: Enable two way talk or not
+                        allowContentPlaying:
+                            type: boolean
+                            description: Enable content playing or not
+                        allowPlayback:
+                            type: boolean
+                            description: Enable playback or not
+    ResponseCardList:
+        type: array
+        items:
+            $ref: "#/definitions/ResponseCardInfo"
+    ResponseCardInfo:
+        type: object
+        properties:
+            cardId:
+                type: string
+                description: The unique identifier of special card
+            ownerId:
+                type: string
+                description: The creator
+            coverId:
+                type: string
+                description: The cover id
+            fid:
+                type: string
+                description: The identifier of chosen photo
+            cardType:
+                type: string
+                enum: ["milestone", "age", "holiday"]
+            transformation:
+                $ref: "#/definitions/PictureTransformation"
+            ageCardDetails:
+                allOf:
+                    - description: Details of an age card. This field is present when the cardType is "age". Otherwise it is now.
+                    - $ref: "#/definitions/AgeCardDetails"
+            eventCardDetails:
+                allOf:
+                    - description: Details of a card related to milestone or holiday. If the cardType is "age" this field is null.
+                    - $ref: "#/definitions/EventCardDetails"
+    RequestCreateCard:
+        type: object
+        properties:
+            coverId:
+                type: string
+                description: The cover id
+            openId:
+                type: string
+                description: The unique identifier of account
+            babyId:
+                type: string
+                description: The unique identifier of baby
+            fid:
+                type: string
+                description: The identifier of chosen photo
+            cardType:
+                type: string
+                description: ""
+                enum: ["milestone", "age", "holiday"]
+            transformation:
+                $ref: "#/definitions/PictureTransformation"
+            ageCardDetails:
+                allOf:
+                    - description: Details of an age card. This field is present when the cardType is "age". Otherwise it is now.
+                    - $ref: "#/definitions/AgeCardDetails"
+            eventCardDetails:
+                allOf:
+                    - description: Details of a card related to milestone or holiday. If the cardType is "age" this field is null.
+                    - $ref: "#/definitions/EventCardDetails"
+
+    RequestUpdateCard:
+        type: object
+        properties:
+            openId:
+                type: string
+                description: The unique identifier of account
+            coverId:
+                type: string
+                description: The cover id
+            fid:
+                type: string
+                description: The identifier of chosen photo
+            transformation:
+                $ref: "#/definitions/PictureTransformation"
+            eventCardDetails:
+                allOf:
+                    - description: Details of a card related to milestone or holiday. If the cardType is "age" this field is null.
+                    - $ref: "#/definitions/EventCardDetails"
+    ResponseCaseList:
+        type: array
+        items:
+            type: object
+            properties:
+                caseId:
+                    type: string
+                    description: The unique identifier of case
+                caseName:
+                    type: string
+                    description: The name of case
+                title:
+                    type: string
+                    description: The title of case
+                description:
+                    type: string
+                    description: The description of case
+                charge:
+                    type: number
+                    description: The charge of case
+                chargeUnit:
+                    type: string
+                    description: The charge unit of case
+                period:
+                    type: number
+                    description: The charge period of case
+                periodUnit:
+                    type: string
+                    description: The charge period unit of case
+                googleProductId:
+                    type: string
+                    description: The product id of google
+                appleProductId:
+                    type: string
+                    description: The product id of apple
+                contents:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            title:
+                                type: string
+                                description: The title of content
+                            # description:
+                            #     type: string
+                            #     description: The description of content
+                            fileId:
+                                type: string
+                                description: The file id of content for download
+                            contents:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        title:
+                                            type: string
+                                            description: The title of content
+                                        description:
+                                            type: string
+                                            description: The description of content
+
+    RequestVerifyReceipt:
+        type: object
+        properties:
+            openId:
+                type: string
+                description: The unique identifier of account
+            babyId:
+                type: string
+                description: The unique identifier of baby
+            caseId:
+                type: string
+                description: The unique identifier of case
+            payload:
+                type: string
+                description: The payload of receipt
+
+    ResponseQueryPurchase:
+        type: array
+        items:
+            type: object
+            properties:
+                pid:
+                    type: string
+                    description: The unique identifier of purchase
+                babyId:
+                    type: string
+                    description: The unique identifier of baby
+                babyName:
+                    type: string
+                    description: Baby's name
+                caseId:
+                    type: string
+                    description: The unique identifier of case
+                title:
+                    type: string
+                    description: The title of case
+                caseName:
+                    type: string
+                    description: The name of case
+                description:
+                    type: string
+                    description: The description of case
+                productId:
+                    type: string
+                    description: The product id
+                receiptId:
+                    type: string
+                    description: Order id, non empty when store is offcial
+                startTime:
+                    type: number
+                    description: The begining time of purchase
+                endTime:
+                    type: number
+                    description: The expires timestamp, -1 means this purchase is still effective.
+                cancelTime:
+                    type: number
+                    description: Cancellation timestamp, -1 means this purchase is not canceled
+                store:
+                    type: string
+                    description: Identify the subscriptions from app store, google play. Possible values are apple, goole, official
+
+    RequestUpdateDevice:
+        type: object
+        properties:
+            timezone:
+                type: string
+                description: Timezone
+            locationName:
+                type: string
+                description: Location name
+    PictureTransformation:
+        description: The transformations that a picture should suffer before being displayed to the screen.
+        required:
+            - zoom
+            - center
+            - rotation
+        properties:
+            zoom:
+                type: number
+                minimum: 1.0
+                example: 2.0
+                description: Amount of zoom applied to picture.
+            center:
+                allOf:
+                    - $ref: "#/definitions/Point"
+                    - description: Normalized coordinates of the center of zoom and of rotation.
+            rotation:
+                type: number
+                example: 45
+                minimum: 0
+                maximum: 360
+                description: Amount of degrees to rotate anti-clockwise around the center.
+    Point:
+        description: A point in plane with normalized coordinates.
+        required:
+            - x
+            - y
+        properties:
+            x:
+                type: number
+                minimum: 0.0
+                maximum: 1.0
+                example: 0.5
+            y:
+                type: number
+                minimum: 0.0
+                maximum: 1.0
+                example: 0.5
+    AgeCardDetails:
+        description: Information that defines an age card.
+        required:
+            - monthsOfAge
+        properties:
+            monthsOfAge:
+                type: integer
+                minimum: 0
+                example: 1
+                description: How many months old is the baby at this card.
+    EventCardDetails:
+        description: Information that defines an event card. Event cards are related to a milestone or to a holiday.
+        required:
+            - eventName
+            - date
+        properties:
+            eventName:
+                type: string
+                example: event_name
+                description: This field identifies the card type. It should contain the name of the milestone or the name of the holiday.
+            date:
+                type: string
+                format: date
+                example: 2019-07-10
+                description: Date in which the event occurred. Must be in yyyy-MM-dd format

@@ -1,0 +1,39 @@
+{
+  "name": "root",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "prestart:local": "npm run build",
+    "start:local": "node ./packages/backend/build/bin/www.js --env development --configpath ../../../../configs",
+    "lint": "node ./node_modules/eslint/bin/eslint.js packages --ext=.ts,.js,.jsx",
+    "lint:fix": "eslint --fix . --ext .ts",
+    "clean": "npx lerna run --parallel clean",
+    "clean:mod": "npx lerna run --parallel clean:mod && npx rimraf ./node_modules yarn.lock",
+    "build": "npm run clean && npm run build:all",
+    "build:all": "npx lerna run build --stream",
+    "test:local": "npm test --envir=development",
+    "test": "cross-env NODE_ENV=$npm_config_envir node --max_old_space_size=4096 ./node_modules/jest/bin/jest.js --runInBand --logHeapUsage --detectOpenHandles --forceExit"
+  },
+  "pre-commit": [
+    "lint",
+    "test:local"
+  ],
+  "devDependencies": {
+    "@types/jest": "26.0.15",
+    "@types/supertest": "^2.0.10",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
+    "cross-env": "7.0.2",
+    "eslint": "^7.14.0",
+    "jest": "26.6.3",
+    "jest-html-reporters": "2.1.0",
+    "lerna": "3.22.1",
+    "npm-run-all": "4.1.5",
+    "pre-commit": "^1.2.2",
+    "supertest": "^6.0.1",
+    "ts-jest": "26.4.3",
+    "ts-node": "9.0.0"
+  }
+}

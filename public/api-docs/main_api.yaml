@@ -1,0 +1,178 @@
+openapi: 3.0.1
+info:
+  title: chat room service
+  description: ""
+  version: 0.0.3
+servers:
+  - url: http://localhost:9000/api/{apiVer}
+    description: The api server
+    variables:
+      apiVer:
+        default: v1
+        enum:
+          - v1
+tags:
+  - name: Credential
+    description: 認證
+paths:
+  /client-auth:
+    post:
+      tags:
+        - Credential
+      summary: 應用註冊
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+                - callbackUrl
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 應用名稱
+                callbackUrl:
+                  type: string
+                  description: 應用端身份認證路徑
+      responses:
+        "200":
+          description: Success
+          content:
+            "*/*":
+              schema:
+                type: object
+                properties:
+                  traceId:
+                    type: string
+                  code:
+                    type: integer
+                    format: Int32
+                  message:
+                    type: string
+                  result:
+                    $ref: "#/components/schemas/ResponseOfClientRegistered"
+        "400":
+          description: Bad request
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+      
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    # 預設
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 10001
+        message:
+          type: string
+          example: OOps!! Something wrong
+    ResponseEmptyResult:
+      type: object
+    ResponseOfClientRegistered:
+      type: object
+      properties:
+        clientId:
+          type: string
+          description: 應用方唯一id
+        clientSecret:
+          type: string
+          description: 應用方金鑰
+        callbackUrl:
+          type: string
+          description: 應用端身份認證路徑
+        name:
+          type: string
+          description: 應用名稱         
+    ResponseObjectForExample:
+      type: object
+      properties:
+        customerId:
+          type: string
+          description: 個案人員ID
+        personId:
+          type: string
+          description: 身分證號
+        medicareId:
+          type: string
+          description: 醫保卡號
+        name:
+          type: string
+          description: 名子
+        birth:
+          type: string
+          description: 生日
+        gender:
+          type: string
+          description: 生日
+          enum: ["0", "1"]
+        bloodType:
+          type: string
+          description: 血型
+          enum: ["A", "B", "O", "AB"]
+        address:
+          type: string
+          description: 地址
+        hometown:
+          type: string
+          description: 家鄉
+        phone:
+          type: string
+          description: 連絡電話
+        education:
+          type: string
+          description: 教育
+        job:
+          type: string
+          description: 職業
+        careLevel:
+          type: string
+          description: 照顧等級
+        mealGrade:
+          type: string
+          description: 膳食計畫
+        lifeStatus:
+          type: string
+          description: 生活狀況
+        familyStatus:
+          type: string
+          description: 生活狀況
+    ResponseArrayForExample:
+      type: array
+      items:
+        type: object
+        properties:
+          contactId:
+            type: string
+            description: 聯絡者id
+          name:
+            type: string
+            description: 聯絡者姓名
+          phone:
+            type: string
+            description: 聯絡者聯絡方式
+          address:
+            type: string
+            description: 連絡者地址
+          gender:
+            type: number
+            description: 連絡者性別

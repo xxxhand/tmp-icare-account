@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "commonjs",
+    "lib": [
+      "ES2018",
+      "DOM"
+    ],
+    "types": [
+      "reflect-metadata",
+      "@types/jest",
+      "node"
+    ],
+    "declaration": true,
+    "composite": true,
+    "removeComments": true,
+    "noEmitOnError": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "baseUrl": "./packages",
+    "paths": {
+      "@demo/*": [
+        "*/src"
+      ]
+    },
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
