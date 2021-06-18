@@ -1,6 +1,5 @@
 import * as path from 'path';
 import express from 'express';
-import bodyParser from 'body-parser';
 import { TNullable } from '@demo/app-common';
 import { AppInterceptor } from './app-interceptor';
 import * as appTracer from './app-request-tracer';
@@ -29,8 +28,8 @@ export class App {
 			throw new Error('Application is null');
 		}
 		this._app.use('/api-docs', express.static(path.resolve(<string>require.main?.path || __dirname, `${_PUBLIC_PATH}/api-docs`)));
-		this._app.use(bodyParser.json({ limit: '10mb' }));
-		this._app.use(bodyParser.urlencoded({ extended: false }));
+		this._app.use(express.json({ limit: '10mb' }));
+		this._app.use(express.urlencoded({ extended: false }));
 		this._app.use(appTracer.handle());
 		this._app.use(AppInterceptor.beforeHandler);
 		this._app.use('/api/v1', v1Route);
