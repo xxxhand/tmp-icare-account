@@ -1,4 +1,5 @@
 import { Model, Schema, Document } from 'mongoose';
+import { MongoClient } from 'mongodb';
 import { Redis } from 'ioredis';
 import { CustomHttpOption } from '../custom-models/custom-http-option';
 import { CustomResult } from '../custom-models/custom-result';
@@ -42,6 +43,7 @@ export interface IMongooseClient {
 	getModel<T extends Document>(name: string): Model<T>;
 	clearData(): Promise<void>;
 	close(): Promise<void>;
+	getNativeClient(): MongoClient;
 }
 
 export interface ICustomHttpClient {
