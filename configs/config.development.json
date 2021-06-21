@@ -13,5 +13,11 @@
     "PORT": 6379,
     "PASS": "hellokitty",
     "DB_NAME": 0
-  }
+  },
+  "SESSION_CONFIGS": {
+		"SECRET": "IcarE_cOMPAl",
+		"EXPIRES_IN": 345600,
+		"DOMAIN_NAME": ".compal-health.com",
+		"NAME": "icaretest115.sid"
+	}
 }
