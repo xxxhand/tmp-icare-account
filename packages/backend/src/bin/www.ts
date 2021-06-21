@@ -1,4 +1,5 @@
 global.Promise = require('bluebird');
+require('dotenv').config();
 import * as http from 'http';
 import { LOGGER, customArgvs } from '@demo/app-common';
 import { AppInitializer } from '../bootstrap/app-initializer';
