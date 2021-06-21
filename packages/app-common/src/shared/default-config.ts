@@ -3,7 +3,26 @@ import * as path from 'path';
 import { logger as LOGGER } from '../custom-tools/custom-logger';
 import { customArgvs } from '../custom-tools/custom-argvs';
 import { CustomValidator } from '../custom-tools/custom-validator';
-import { TNullable, IConfig } from '../custom-types';
+import { TNullable } from '../custom-types';
+
+
+interface IConfig {
+	ENABLE_CACHE: boolean,
+	DEFAULT_MONGO: {
+		URI: string;
+		USER?: string;
+		PASS?: string;
+		POOL_SIZE: number;
+		DB_NAME: string;
+	},
+	DEFAULT_REDIS: {
+		URI: string;
+		HOST: string,
+		PORT: number,
+		PASS?: string;
+		DB_NAME: number;
+  }
+}
 
 LOGGER.info(`Run on environment ${customArgvs.env}`);
 LOGGER.info('Load config start...');

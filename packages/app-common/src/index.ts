@@ -1,6 +1,4 @@
 import { logger } from './custom-tools/custom-logger';
-import { defaultConfig } from './shared/default-config';
-
 
 export { ErrorCodes } from './custom-codes/error-codes';
 export { HttpCodes } from './custom-codes/http-codes';
@@ -14,7 +12,6 @@ export { validateStrategy, CustomValidator } from './custom-tools/custom-validat
 export {
 	TNullable,
 	ICodeObject,
-	IConfig,
 	IMongooseClient,
 	IBaseRequest,
 	ICustomHttpClient,
@@ -27,5 +24,5 @@ export { CustomClassBuilder } from './custom-tools/custom-class-builder';
 export { CustomHttpClient } from './custom-tools/custom-http-client';
 export { CustomJsonProp } from './custom-tools/custom-decorators/custom-json-prop';
 export { commonInjectorCodes } from './shared/default-mapping-codes';
+export { defaultConfig as defConf } from './shared/default-config';
 export const LOGGER = logger;
-export const defConf = defaultConfig;

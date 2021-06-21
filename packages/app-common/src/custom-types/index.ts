@@ -13,24 +13,6 @@ export interface ICodeObject {
 
 export type TNullable<T> = T | undefined | null;
 
-export interface IConfig {
-	ENABLE_CACHE: boolean,
-	DEFAULT_MONGO: {
-		URI: string;
-		USER?: string;
-		PASS?: string;
-		POOL_SIZE: number;
-		DB_NAME: string;
-	},
-	DEFAULT_REDIS: {
-		URI: string;
-		HOST: string,
-		PORT: number,
-		PASS?: string;
-		DB_NAME: number;
-  }
-}
-
 export interface IBaseRequest<T> {
 	checkRequired(): T;
 }
