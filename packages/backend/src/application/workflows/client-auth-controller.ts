@@ -16,7 +16,7 @@ import { RegisterClientRequest } from '../../domain/value-objects/register-clien
 import { ClientEntity } from '../../domain/entities/client-entity';
 
 @injectable()
-export class ClientAuthRoute {
+export class ClientAuthController {
 
 	@lazyInject(InjectorCodes.I_CLIENT_REPO)
 	private _repo: TNullable<IClientRepository>;
@@ -35,8 +35,8 @@ export class ClientAuthRoute {
 	}
 
 	public static build(): Router {
-		defaultContainer.bind(ClientAuthRoute).toSelf().inSingletonScope();
-		const _ctrl = defaultContainer.get(ClientAuthRoute);
+		defaultContainer.bind(ClientAuthController).toSelf().inSingletonScope();
+		const _ctrl = defaultContainer.get(ClientAuthController);
 		const r = Router();
 		r.route('/client-auth')
 			.post(handleExpressAsync(_ctrl.create));

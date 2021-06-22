@@ -2,10 +2,11 @@ import * as path from 'path';
 import express from 'express';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
-import { TNullable, commonInjectorCodes, defaultContainer, IMongooseClient, defConf, LOGGER } from '@demo/app-common';
+import { TNullable, commonInjectorCodes, defaultContainer, IMongooseClient, defConf, LOGGER, CustomValidator } from '@demo/app-common';
 import { AppInterceptor } from './app-interceptor';
 import * as appTracer from './app-request-tracer';
-import v1Route from '../application/workflows/v1-route';
+import { V1Router } from '../application/workflows/v1-router';
+import { MockRouter } from '../application/workflows/mock-router';
 
 const _PUBLIC_PATH = '../../../../public';
 
@@ -36,7 +37,13 @@ export class App {
 		this._app.use(this._makeSession());
 		this._app.use(appTracer.handle());
 		this._app.use(AppInterceptor.beforeHandler);
-		this._app.use('/api/v1', v1Route);
+
+		const v1Router = new V1Router();
+		this._app.use(v1Router.prefix, v1Router.router);
+
+		const mockRouter = new MockRouter();
+		this._app.use(mockRouter.prefix, mockRouter.router);
+
 		this._app.use(AppInterceptor.completeHandler);
 		this._app.use(AppInterceptor.notFoundHandler);
 		this._app.use(AppInterceptor.errorHandler);
@@ -55,6 +62,8 @@ export class App {
 			oStore = new session.MemoryStore();
 		}
 
+		const oDomain: TNullable<string> = CustomValidator.nonEmptyString(defConf.SESSION_CONFIGS.DOMAIN_NAME) ? defConf.SESSION_CONFIGS.DOMAIN_NAME : void 0;
+
 		return session({
 			secret: defConf.SESSION_CONFIGS.SECRET,
 			store: oStore,
@@ -62,8 +71,8 @@ export class App {
 			saveUninitialized: true,
 			rolling: true,
 			cookie: {
-				domain: defConf.SESSION_CONFIGS.DOMAIN_NAME,
-				secure: true,
+				domain: oDomain,
+				secure: oDomain ? true : false,
 				maxAge: defConf.SESSION_CONFIGS.EXPIRES_IN * 1000,
 			},
 			name: defConf.SESSION_CONFIGS.NAME,

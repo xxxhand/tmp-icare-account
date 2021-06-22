@@ -1,5 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 
+declare module 'express-session' {
+	interface SessionData {
+		user: ISessionUserInfo;
+	}
+}
+
+interface ISessionUserInfo {
+	account: string;
+	name: string;
+	age: number;
+};
+
 interface IMulterFile {
 	path: string;
 	originalname: string;
