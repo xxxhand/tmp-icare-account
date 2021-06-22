@@ -20,14 +20,11 @@ export class MockRouter {
 	private _addSession = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		req.session.user = req.body;
 		res.locals['result'] = new CustomResult();
-		LOGGER.info(`post - ${req.session.id}`);
-		LOGGER.info(`post - ${JSON.stringify(req.session.user)}`);
 		await next();
 	}
 
 	private _getSession = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		res.locals['result'] = new CustomResult().withResult(req.session.user);
-		LOGGER.info(`get - ${req.session.id}`);
 		await next();
 	}
 
