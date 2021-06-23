@@ -1,19 +1,29 @@
 import * as fs from 'fs-extra';
 import { Request, Response, NextFunction } from 'express';
 import { LOGGER, HttpCodes, CustomError, CustomResult, getTraceId, CustomValidator } from '@demo/app-common';
+import { AppIgnoreHandler } from './app-ignore-handler';
 import { ICustomExpressRequest } from '../application/application-types';
 
 export class AppInterceptor {
 
 	/** Before starting request handler */
-	static async beforeHandler(req: Request, res: Response, next: NextFunction): Promise<any> {
+	static beforeHandler = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
 		LOGGER.info('-----------------------------------------------------------');
 		LOGGER.info(`${req.method} ${req.path} - start`);
 		await next();
 	}
 
+	/** Authentication handler */
+	static authenticationHandler = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+		if (AppIgnoreHandler.ignore(req.method, req.path)) {
+			return next();
+		}
+
+		await next();
+	}
+
 	/** Complete request */
-	static async completeHandler(req: Request, res: Response, next: NextFunction): Promise<any> {
+	static completeHandler = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
 		const r = res.locals['result'] as CustomResult;
 		if (!r) {
 			return next();
@@ -24,7 +34,7 @@ export class AppInterceptor {
 	}
 
 	/** Error handler */
-	static async errorHandler(ex: any, req: Request, res: Response, next: NextFunction): Promise<any> {
+	static errorHandler = async (ex: any, req: Request, res: Response, next: NextFunction): Promise<any> => {
 		let error: CustomError = ex;
 		if (!(ex instanceof CustomError)) {
 			LOGGER.error(ex.stack);
@@ -65,7 +75,7 @@ export class AppInterceptor {
 	}
 
 	/** Path not found handler */
-	static async notFoundHandler(req: Request, res: Response): Promise<any> {
+	static notFoundHandler = async (req: Request, res: Response): Promise<any> => {
 		const str = `${req.method} ${req.originalUrl} - 404 Path not found`;
 		LOGGER.info(str);
 		res.status(HttpCodes.NOT_FOUND).send(str);

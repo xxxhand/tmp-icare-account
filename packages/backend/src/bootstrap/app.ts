@@ -37,7 +37,7 @@ export class App {
 		this._app.use(this._makeSession());
 		this._app.use(appTracer.handle());
 		this._app.use(AppInterceptor.beforeHandler);
-
+		this._app.use(AppInterceptor.authenticationHandler);
 		const v1Router = new V1Router();
 		this._app.use(v1Router.prefix, v1Router.router);
 
