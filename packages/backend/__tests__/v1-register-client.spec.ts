@@ -6,13 +6,17 @@ import { InjectorCodes } from '../src/domain/enums/injector-codes';
 import { ErrorCodes } from '../src/domain/enums/error-codes';
 import { IClientRepository } from '../src/domain/repositories/i-client-repository';
 
-const _ENDPOINT = '/api/v1/client-auth';
+const _ENDPOINT = '/api/client-auth';
+interface IBody {
+	name: string;
+	callbackUrl: string;
+};
 
 describe('Register credential spec', () => {
 	let agentClient: superTest.SuperAgentTest;
 	let clientRepo: IClientRepository;
 	let db: IMongooseClient;
-	const defaultBody = {
+	const defaultBody: IBody = {
 		name: 'iLearning',
 		callbackUrl: 'https://xxx.ccc.com',
 	};
@@ -33,7 +37,7 @@ describe('Register credential spec', () => {
 	});
 	describe('Required fileds', () => {
 		test('[2001] Parameter "name" is empty', async (done) => {
-			const b = CustomUtils.deepClone(defaultBody);
+			const b = CustomUtils.deepClone<IBody>(defaultBody);
 			b.name = '';
 			const res = await agentClient
 				.post(_ENDPOINT)
@@ -49,7 +53,7 @@ describe('Register credential spec', () => {
 			done();
 		});
 		test('[2004] Parameter "callbackUrl" is empty', async (done) => {
-			const b = CustomUtils.deepClone(defaultBody);
+			const b = CustomUtils.deepClone<IBody>(defaultBody);
 			b.callbackUrl = '';
 			const res = await agentClient
 				.post(_ENDPOINT)
@@ -65,7 +69,7 @@ describe('Register credential spec', () => {
 			done();
 		});
 		test('[2004] Parameter "callbackUrl" is invalid', async (done) => {
-			const b = CustomUtils.deepClone(defaultBody);
+			const b = CustomUtils.deepClone<IBody>(defaultBody);
 			b.callbackUrl = 'mqtt://sss.com';
 			const res = await agentClient
 				.post(_ENDPOINT)

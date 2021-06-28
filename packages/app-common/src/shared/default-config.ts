@@ -8,6 +8,10 @@ import { TNullable } from '../custom-types';
 
 interface IConfig {
 	ENABLE_CACHE: boolean,
+	LUNA_WEB: {
+		ROOT: string,
+		ACCOUNT: string,
+	},
 	DEFAULT_MONGO: {
 		URI: string;
 		USER?: string;

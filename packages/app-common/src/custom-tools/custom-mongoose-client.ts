@@ -24,7 +24,7 @@ export class CustomMongooseClient implements IMongooseClient {
 	constructor(uri: string, options: ConnectOptions) {
 		this._uri = uri;
 		if (options) {
-			const copiedOption = CustomUtils.deepClone(options);
+			const copiedOption = CustomUtils.deepClone<ConnectOptions>(options);
 			this._defaultOptions = { ...this._defaultOptions, ...copiedOption };
 		}
 		if (!CustomValidator.nonEmptyString(this._defaultOptions.user || '')) {

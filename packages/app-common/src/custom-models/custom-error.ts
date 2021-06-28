@@ -27,39 +27,45 @@ const _codeMap = new Map<string, ICodeObject>()
 		httpStatus: HttpCodes.OK,
 		message: 'Success',
 	})
+	.set(ErrorCodes.ERR_MUST_BE_MOBILE, {
+		alias: ErrorCodes.ERR_MUST_BE_MOBILE,
+		code: 90003,
+		httpStatus: HttpCodes.BAD_REQ,
+		message: 'Invalid mobile format',
+	})
 	.set(ErrorCodes.ERR_EXEC_DB_FAIL, {
 		alias: ErrorCodes.ERR_EXEC_DB_FAIL,
-		code: 90001,
+		code: 900,
 		httpStatus: HttpCodes.INTERNAL_ERROR,
 		message: 'Database execution fail',
 	})
 	.set(ErrorCodes.ERR_JSON_FORMAT_FAIL, {
 		alias: ErrorCodes.ERR_JSON_FORMAT_FAIL,
-		code: 90002,
+		code: 900,
 		httpStatus: HttpCodes.BAD_REQ,
 		message: 'Invalid json format',
 	})
 	.set(ErrorCodes.ERR_DEPRECATED, {
 		alias: ErrorCodes.ERR_DEPRECATED,
-		code: 90003,
+		code: 900,
 		httpStatus: HttpCodes.DEPRECATED,
 		message: 'Depecated resources',
 	})
 	.set(ErrorCodes.ERR_NOT_IMPLEMENT, {
 		alias: ErrorCodes.ERR_NOT_IMPLEMENT,
-		code: 90004,
+		code: 900,
 		httpStatus: HttpCodes.NOT_IMPLEMENT,
 		message: 'Not implemented',
 	})
 	.set(ErrorCodes.ERR_UN_AUTH, {
 		alias: ErrorCodes.ERR_UN_AUTH,
-		code: 90005,
+		code: 900,
 		httpStatus: HttpCodes.UN_AUTHORIZE,
 		message: 'Unauthorized',
 	})
 	.set(ErrorCodes.ERR_EXEC_HTTP_ERROR, {
 		alias: ErrorCodes.ERR_EXEC_HTTP_ERROR,
-		code: 90006,
+		code: 900,
 		httpStatus: HttpCodes.BAD_REQ,
 		message: 'Bad request',
 	})
@@ -71,55 +77,55 @@ const _codeMap = new Map<string, ICodeObject>()
 	});
 
 export class CustomError extends Error {
-    public type: string;
-    public code: number;
-    public message: string;
-    public name: string;
-    public httpStatus: number;
+	public type: string;
+	public code: number;
+	public message: string;
+	public name: string;
+	public httpStatus: number;
 
-    constructor(codeType: string, replaceString: string = '') {
-    	super();
-    	const err = CustomError.getCode(codeType);
-    	this.type = err.code != 99999 ? codeType : ErrorCodes.ERR_EXCEPTION;
-    	this.code = err.code;
-    	this.message = replaceString || err.message;
-    	this.name = this.constructor.name;
-    	this.httpStatus = err.httpStatus;
-    }
+	constructor(codeType: string, replaceString: string = '') {
+		super();
+		const err = CustomError.getCode(codeType);
+		this.type = err.code != 99999 ? codeType : ErrorCodes.ERR_EXCEPTION;
+		this.code = err.code;
+		this.message = replaceString || err.message;
+		this.name = this.constructor.name;
+		this.httpStatus = err.httpStatus;
+	}
 
-    public isSuccess(): boolean {
-    	return Object.is(this.code, 0);
-    }
+	public isSuccess(): boolean {
+		return Object.is(this.code, 0);
+	}
 
-    public isException(): boolean {
-    	return Object.is(this.code, 99999);
-    }
+	public isException(): boolean {
+		return Object.is(this.code, 99999);
+	}
 
-    public static mergeCodes(codes: Array<ICodeObject>): void {
-    	if (!Array.isArray(codes) || codes.length === 0) {
-    		throw new Error('Cannot merge with an empty array');
-    	}
-    	for (const c of codes) {
-    		if (!_validateCodeFormat(c)) {
-    			throw new Error('Illegal error code format');
-    		}
-    		if (_codeMap.has(c.alias)) {
-    			throw new Error(`Duplicate key ${c.alias} was defined`);
-    		}
-    		_codeMap.set(c.alias, c);
-    	}
-    }
+	public static mergeCodes(codes: Array<ICodeObject>): void {
+		if (!Array.isArray(codes) || codes.length === 0) {
+			throw new Error('Cannot merge with an empty array');
+		}
+		for (const c of codes) {
+			if (!_validateCodeFormat(c)) {
+				throw new Error('Illegal error code format');
+			}
+			if (_codeMap.has(c.alias)) {
+				throw new Error(`Duplicate key ${c.alias} was defined`);
+			}
+			_codeMap.set(c.alias, c);
+		}
+	}
 
-    public static getCode(codeType: string = ''): ICodeObject {
-    	let err = _codeMap.get(codeType);
-    	if (!err) {
-    		err = {
-    			alias: ErrorCodes.ERR_EXCEPTION,
-    			code: 99999,
-    			httpStatus: 500,
-    			message: codeType || 'Ops! Exception', 
-    		};
-    	}
-    	return err;
-    }
+	public static getCode(codeType: string = ''): ICodeObject {
+		let err = _codeMap.get(codeType);
+		if (!err) {
+			err = {
+				alias: ErrorCodes.ERR_EXCEPTION,
+				code: 99999,
+				httpStatus: 500,
+				message: codeType || 'Ops! Exception',
+			};
+		}
+		return err;
+	}
 }

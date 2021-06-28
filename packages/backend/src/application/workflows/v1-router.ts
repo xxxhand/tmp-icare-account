@@ -3,7 +3,7 @@ import { CustomResult } from '@demo/app-common';
 import { ClientAuthController } from './client-auth-controller';
 
 export class V1Router {
-	public prefix: string = '/api/v1';
+	public prefix: string = '/api';
 	public router: Router = Router();
 
 	constructor() {

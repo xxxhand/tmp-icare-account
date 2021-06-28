@@ -1,22 +1,69 @@
 openapi: 3.0.1
 info:
-  title: chat room service
+  title: icare account service
   description: ""
   version: 0.0.3
 servers:
-  - url: http://localhost:9000/api/{apiVer}
+  - url: http://localhost:9000/api
     description: The api server
-    variables:
-      apiVer:
-        default: v1
-        enum:
-          - v1
 tags:
   - name: Credential
     description: 認證
+  - name: Account
+    description: 帳號
 paths:
+  /account/check:
+    post:
+      tags:
+        - Account
+      summary: 檢查帳號存在與否
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - account
+              type: object
+              properties:
+                account:
+                  type: string
+                  description: 帳號
+      responses:
+        "200":
+          description: Success
+          content:
+            "*/*":
+              schema:
+                type: object
+                properties:
+                  traceId:
+                    type: string
+                  code:
+                    type: integer
+                    format: Int32
+                  message:
+                    type: string
+                  field:
+                    type: string
+                  result:
+                    $ref: "#/components/schemas/ResponseOfAccountCheck"
+        "400":
+          description: Bad request
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body                  
   /client-auth:
     post:
+      deprecated: true
       tags:
         - Credential
       summary: 應用註冊
@@ -53,6 +100,8 @@ paths:
                     type: string
                   result:
                     $ref: "#/components/schemas/ResponseOfClientRegistered"
+                  field:
+                    type: string
         "400":
           description: Bad request
           content:
@@ -80,14 +129,32 @@ components:
     ErrorResponse:
       type: object
       properties:
+        traceId:
+          type: string
+          example: kjsadfkjsakjdf-asdfsdfskdf00-ksdnfkls
         code:
           type: integer
           example: 10001
         message:
           type: string
           example: OOps!! Something wrong
+        result:
+          type: object
+          nullable: true
+        field:
+          type: string
+          example: account
     ResponseEmptyResult:
       type: object
+    ResponseOfAccountCheck:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: 有效的
+        exists:
+          type: boolean
+          description: 存在的
     ResponseOfClientRegistered:
       type: object
       properties:

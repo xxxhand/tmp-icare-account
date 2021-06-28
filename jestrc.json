@@ -13,8 +13,12 @@
     "js",
     "jsx",
     "ts",
-    "tsx"
+    "tsx",
+    "json"
   ],
+  "modulePathIgnorePatterns": [
+
+	],
   "testEnvironment": "node",
   "reporters": [
     "default",

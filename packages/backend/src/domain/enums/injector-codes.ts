@@ -4,4 +4,5 @@ export enum InjectorCodes {
   I_CLIENT_REPO = 'iClientRepository',
   I_CHAT_ROOM_REPO = 'iChatRoomRepository',
   I_TOKEN_REPO = 'iTokenRepository',
+  I_ACCOUNT_REPO = 'iAccountRepository',
 };

@@ -27,6 +27,11 @@ import { ClientEntity } from '../src/domain/entities/client-entity';
 import { IClientRepository } from '../src/domain/repositories/i-client-repository';
 
 let _ENDPOINT = 'http://localhost:%d/wss/v1/chat-room';
+interface IBody {
+	chatRoomId: string;
+	userId: string;
+	userName: string;
+};
 
 describe('Join room spec', () => {
 	let clientSocket: Socket;
@@ -38,7 +43,7 @@ describe('Join room spec', () => {
 	let tokenRepo: ITokenRepository;
 	let mockClient: ClientEntity;
 	let clientRepo: IClientRepository;
-	const defBody = {
+	const defBody: IBody = {
 		chatRoomId: '',
 		userId: 'xxxhand',
 		userName: 'xxxhand',
@@ -105,7 +110,7 @@ describe('Join room spec', () => {
 	});
 	describe('Required fields', () => {
 		test('[1002] Parameter "chatRoomId" is empty', async (done) => {
-			const b = CustomUtils.deepClone(defBody);
+			const b = CustomUtils.deepClone<IBody>(defBody);
 			b.chatRoomId = '';
 			clientSocket.emit(RoomEvents.JOIN_ROOM, b);
 			const err = CustomError.getCode(ErrorCodes.CHAT_ROOM_ID_INVALID);
@@ -118,7 +123,7 @@ describe('Join room spec', () => {
 			done();
 		});
 		test('[1003] Parameter "userId" is empty', async (done) => {
-			const b = CustomUtils.deepClone(defBody);
+			const b = CustomUtils.deepClone<IBody>(defBody);
 			b.userId = '';
 			clientSocket.emit(RoomEvents.JOIN_ROOM, b);
 			const err = CustomError.getCode(ErrorCodes.CLIENT_USER_ID_INVALID);
@@ -131,7 +136,7 @@ describe('Join room spec', () => {
 			done();
 		});
 		test('[1004] Parameter "userName" is empty', async (done) => {
-			const b = CustomUtils.deepClone(defBody);
+			const b = CustomUtils.deepClone<IBody>(defBody);
 			b.userName = '';
 			clientSocket.emit(RoomEvents.JOIN_ROOM, b);
 			const err = CustomError.getCode(ErrorCodes.CLIENT_USER_NAME_INVALID);
@@ -170,7 +175,7 @@ describe('Join room spec', () => {
 			done();
 		});
 		test('[1001] Invalid room', async (done) => {
-			const b = CustomUtils.deepClone(defBody);
+			const b = CustomUtils.deepClone<IBody>(defBody);
 			b.chatRoomId = '604afe61e4a7e6bfdaf01fa0';
 			clientSocket.emit(RoomEvents.JOIN_ROOM, b);
 			const err = CustomError.getCode(ErrorCodes.NOT_EXIST_CHAT_ROOM);
@@ -183,7 +188,7 @@ describe('Join room spec', () => {
 			done();
 		});
 		test('[1011] Room is not opened', async (done) => {
-			const b = CustomUtils.deepClone(defBody);
+			const b = CustomUtils.deepClone<IBody>(defBody);
 			b.chatRoomId = closedRoom.chatRoomId;
 			clientSocket.emit(RoomEvents.JOIN_ROOM, b);
 			const err = CustomError.getCode(ErrorCodes.CHAT_ROOM_IS_CLOSE);
