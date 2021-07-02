@@ -6,4 +6,5 @@ export enum InjectorCodes {
   I_TOKEN_REPO = 'iTokenRepository',
   I_ACCOUNT_REPO = 'iAccountRepository',
   I_LUNA_REPO = 'iLunaRepository',
+  I_ACCOUNT_SRV = 'iAccountService',
 };

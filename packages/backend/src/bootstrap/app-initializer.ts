@@ -24,6 +24,8 @@ import { IAccountRepository } from '../domain/repositories/i-account-repository'
 import { AccountRepository } from '../infra/repositories/account-repository';
 import { ILunaRepository } from '../domain/repositories/i-luna-repository';
 import { LunaRepository } from '../infra/repositories/luna-repository';
+import { IAccountService } from '../application/services/interfaces/i-account-service';
+import { AccountService } from '../application/services/account-service';
 
 export class AppInitializer {
 
@@ -82,6 +84,10 @@ export class AppInitializer {
 			.bind<IAccountRepository>(InjectorCodes.I_ACCOUNT_REPO).to(AccountRepository).inSingletonScope();
 		defaultContainer
 			.bind<ILunaRepository>(InjectorCodes.I_LUNA_REPO).to(LunaRepository).inSingletonScope();
+			
+		/** application services */
+		defaultContainer
+			.bind<IAccountService>(InjectorCodes.I_ACCOUNT_SRV).to(AccountService).inSingletonScope();
 			
 		/** socket handlers */
 		defaultContainer
