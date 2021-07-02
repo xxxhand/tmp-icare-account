@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Socket, Namespace } from 'socket.io';
+import { Socket } from 'socket.io';
 import { CustomError, ICodeObject, TNullable } from '@demo/app-common';
 
 @injectable()

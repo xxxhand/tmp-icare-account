@@ -1,4 +1,4 @@
-export class AccountCheckResponse {
+export class AccountCheckResult {
 	valid: boolean = true;
 	exists: boolean = false;
 

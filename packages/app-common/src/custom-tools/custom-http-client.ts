@@ -31,7 +31,7 @@ export class CustomHttpClient implements ICustomHttpClient {
 			const result = new CustomResult()
 				.withCode(res.ok ? 0 : res.status);
 			const m = await res.text();
-			if (m.startsWith('{')) {
+			if (m.startsWith('{') || m.startsWith('[')) {
 				result.result = JSON.parse(m);
 			}
 			if (!result.isOK()) {

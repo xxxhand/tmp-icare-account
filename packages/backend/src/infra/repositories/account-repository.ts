@@ -2,24 +2,23 @@ import { injectable, inject, named } from 'inversify';
 import {
 	LOGGER,
 	commonInjectorCodes,
-	ICustomHttpClient,
 	TNullable,
-	defConf,
 	CustomUtils,
-	CustomHttpOption,
+	CustomValidator,
+	IMongooseClient,
 } from '@demo/app-common';
 import { IAccountRepository } from '../../domain/repositories/i-account-repository';
 import { AccountEntity } from '../../domain/entities/account-entity';
 
 @injectable()
 export class AccountRepository implements IAccountRepository {
-	private _httpClient: ICustomHttpClient;
 	private _data: Array<AccountEntity> = [];
+	private _defaultClient: IMongooseClient;
 
 	constructor(
-		@inject(commonInjectorCodes.I_HTTP_CLIENT) httpClient: ICustomHttpClient
+		@inject(commonInjectorCodes.I_MONGOOSE_CLIENT) @named(commonInjectorCodes.DEFAULT_MONGO_CLIENT) defaultClient: IMongooseClient
 	) {
-		this._httpClient = httpClient;
+		this._defaultClient = defaultClient;
 	}
 
 	save = async (account: TNullable<AccountEntity>): Promise<TNullable<AccountEntity>> => {
@@ -31,14 +30,11 @@ export class AccountRepository implements IAccountRepository {
 		return account;
 	}
 	checkExist = async (account: string): Promise<boolean> => {
-		try {
-			const opt = new CustomHttpOption(
-				.setUrl(`${defConf.LUNA_WEB.ROOT}/${defConf.LUNA_WEB.ACCOUNT}`)
-				.adß
-		} catch (ex) {
-			LOGGER.error('Call Luna api fail');
-			LOGGER.error(ex.stack);
+		if (!CustomValidator.nonEmptyString(account)) {
+			return true;
 		}
+		const ary = this._data.filter((x) => x.account === account);
+		return ary.length > 0;
 	}
 
 }

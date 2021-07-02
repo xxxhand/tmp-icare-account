@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import { CustomResult } from '@demo/app-common';
 import { ClientAuthController } from './client-auth-controller';
+import { AccountController } from './account-controller';
 
 export class V1Router {
 	public prefix: string = '/api';
@@ -17,6 +18,7 @@ export class V1Router {
 				await next();
 			});
 		this.router
+			.use(AccountController.build())
 			.use(ClientAuthController.build());
 	}
 }

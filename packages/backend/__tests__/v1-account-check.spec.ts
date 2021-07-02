@@ -1,4 +1,5 @@
 import * as superTest from 'supertest';
+import { mock } from 'jest-mock-extended';
 import {
 	CustomError,
 	CustomUtils,
@@ -8,12 +9,13 @@ import {
 	ErrorCodes,
 	HttpCodes,
 	ICustomHttpClient,
+	CustomResult,
 } from '@demo/app-common';
 import { AppInitializer } from '../src/bootstrap/app-initializer';
 import { App } from '../src/bootstrap/app';
 import { InjectorCodes } from '../src/domain/enums/injector-codes';
-import { MockLunaAccountNotExist } from '../__mocks__/mock-luna-account-not-exist';
-import { MockLunaAccountExist } from '../__mocks__/mock-luna-account-exist';
+import { AccountEntity } from '../src/domain/entities/account-entity';
+import { IAccountRepository } from '../src/domain/repositories/i-account-repository';
 
 const _ENDPOINT = '/api/account/check';
 interface IBody {
@@ -23,6 +25,8 @@ interface IBody {
 describe('Account check spec', () => {
 	let agentClient: superTest.SuperAgentTest;
 	let db: IMongooseClient;
+	let accountRepo: IAccountRepository;
+	let oAccount: AccountEntity;
 	const defBody: IBody = {
 		account: '0987654321',
 	};
@@ -33,6 +37,36 @@ describe('Account check spec', () => {
 		db = defaultContainer.getNamed(commonInjectorCodes.I_MONGOOSE_CLIENT, commonInjectorCodes.DEFAULT_MONGO_CLIENT);
 		await db.clearData();
 		agentClient = superTest.agent(new App().app);
+		accountRepo = defaultContainer.get(InjectorCodes.I_ACCOUNT_REPO);
+
+		oAccount = new AccountEntity();
+		oAccount.account = defBody.account;
+		oAccount = await accountRepo.save(oAccount) as AccountEntity;
+		
+		// rebind mock http client - start
+		const nonExist = new CustomResult()
+			.withResult({
+				success: true,
+				data: {
+					accountExists: false,
+				},
+			});
+
+		const existResult = new CustomResult()
+			.withResult({
+				success: true,
+				data: {
+					accountExists: true,
+				},
+			});
+		
+		const http = mock<ICustomHttpClient>();
+		http.tryPostJson
+			.mockResolvedValueOnce(nonExist)
+			.mockResolvedValueOnce(existResult)
+			.mockResolvedValueOnce(nonExist);
+		defaultContainer.rebind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT).toConstantValue(http);
+		// rebind mock http client - end
 	});
 	afterAll(async () => {
 		await db.clearData();
@@ -72,8 +106,6 @@ describe('Account check spec', () => {
 	});
 	describe('Validation rules', () => {
 		test('[Account does not exist]', async () => {
-			// rebind http client
-			defaultContainer.rebind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT).to(MockLunaAccountNotExist);
 			const b = CustomUtils.deepClone(defBody);
 			b.account = '0956655655';
 			const res = await agentClient
@@ -94,8 +126,6 @@ describe('Account check spec', () => {
 	});
 	describe('Success', () => {
 		test('[Account exist in Luna]', async () => {
-			// rebind http client
-			defaultContainer.rebind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT).to(MockLunaAccountExist);
 			const b = CustomUtils.deepClone(defBody);
 			b.account = '0956655657';
 			const res = await agentClient
@@ -114,8 +144,6 @@ describe('Account check spec', () => {
 			});
 		});
 		test('[Account exist in db]', async () => {
-			// rebind http client
-			defaultContainer.rebind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT).to(MockLunaAccountNotExist);
 			const res = await agentClient
 				.post(_ENDPOINT)
 				.send(defBody);

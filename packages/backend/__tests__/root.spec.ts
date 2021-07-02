@@ -9,7 +9,7 @@ describe('Index test', () => {
 	});
 	test('Should be hello world', async (done) => {
 		const res = await agentClient
-			.get('/api/v1');
+			.get('/api');
 
 		expect(res.status).toBe(200);
 		expect(res.body).toEqual({

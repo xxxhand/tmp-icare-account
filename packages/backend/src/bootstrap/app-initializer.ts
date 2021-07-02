@@ -22,6 +22,8 @@ import { ITokenRepository } from '../domain/repositories/i-token-repository';
 import { TokenRepository } from '../infra/repositories/token-repository';
 import { IAccountRepository } from '../domain/repositories/i-account-repository';
 import { AccountRepository } from '../infra/repositories/account-repository';
+import { ILunaRepository } from '../domain/repositories/i-luna-repository';
+import { LunaRepository } from '../infra/repositories/luna-repository';
 
 export class AppInitializer {
 
@@ -78,7 +80,9 @@ export class AppInitializer {
 			.bind<ITokenRepository>(InjectorCodes.I_TOKEN_REPO).to(TokenRepository).inSingletonScope();
 		defaultContainer
 			.bind<IAccountRepository>(InjectorCodes.I_ACCOUNT_REPO).to(AccountRepository).inSingletonScope();
-
+		defaultContainer
+			.bind<ILunaRepository>(InjectorCodes.I_LUNA_REPO).to(LunaRepository).inSingletonScope();
+			
 		/** socket handlers */
 		defaultContainer
 			.bind<AbstractSocketHandler>(InjectorCodes.ABS_SOCKET_HANDLER)

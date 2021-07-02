@@ -1,6 +1,6 @@
 export class AccountEntity {
   id: string = '';
   account: string = '';
-  valid: boolean = false;
+  valid: boolean = true;
   isLuna: boolean = false;
 }

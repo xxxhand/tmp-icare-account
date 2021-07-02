@@ -3,6 +3,7 @@ import * as http from 'http';
 import * as util from 'util';
 import pEvent from 'p-event';
 import { io, Socket } from 'socket.io-client';
+import { mock } from 'jest-mock-extended';
 import {
 	CustomUtils,
 	CustomError,
@@ -11,8 +12,8 @@ import {
 	IMongooseClient,
 	commonInjectorCodes,
 	ICustomHttpClient,
+	CustomResult,
 } from '@demo/app-common';
-import { MockAuthorize } from '../__mocks__/mock-authorize';
 import { RoomEvents } from '../src/domain/enums/room-event-codes';
 import { AppWebSocket } from '../src/bootstrap/app-web-socket';
 import { AppInitializer } from '../src/bootstrap/app-initializer';
@@ -88,7 +89,9 @@ describe('Join room spec', () => {
 		defBody.chatRoomId = room.chatRoomId;
 
 		// Mock http client
-		defaultContainer.rebind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT).to(MockAuthorize);
+		const httpClient = mock<ICustomHttpClient>();
+		httpClient.tryGet.mockResolvedValue(new CustomResult());
+		defaultContainer.rebind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT).toConstantValue(httpClient);
 
 		_ENDPOINT = util.format(_ENDPOINT, addr.port);
 		clientSocket = io(_ENDPOINT, {
