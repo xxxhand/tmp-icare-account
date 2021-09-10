@@ -6,4 +6,8 @@ export class AccountCheckResult {
 		this.valid = false;
 		this.exists = true;
 	}
+
+	isValid(): boolean {
+		return this.valid;
+	}
 }
