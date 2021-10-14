@@ -1,16 +1,11 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import { injectable } from 'inversify';
 import {
-	CustomClassBuilder,
 	CustomResult,
 	defaultContainer,
 	lazyInject,
 	TNullable,
-	CustomUtils,
 	LOGGER,
-	ErrorCodes,
-	CustomValidator,
-	validateStrategy,
 	CustomHttpOption,
 	CustomError,
 } from '@demo/app-common';
@@ -27,20 +22,12 @@ export class AccountController {
 	private _accountRepo: TNullable<IAccountRepository>;
 	@lazyInject(InjectorCodes.I_ACCOUNT_SRV)
 	private _accountService: TNullable<IAccountService>;
-	private _twnMobileFormat = /^09\d{8}$/;
 
 	public check = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		const { account } = req.body;
-		new CustomValidator()
-			.checkThrows(account,
-				{ m: ErrorCodes.ERR_MUST_BE_MOBILE, s: validateStrategy.NON_EMPTY_STRING },
-				{ m: ErrorCodes.ERR_MUST_BE_MOBILE, fn: (val) => this._twnMobileFormat.test(val) }
-			);
-
 		const opt = new CustomHttpOption()
 			.addHeader('user-agent', req.headers['user-agent']);
 
-		const result = await this._accountService?.checkAccountExist(account, opt);
+		const result = await this._accountService?.checkAccountExist(req.body.account, opt);
 
 		res.locals['result'] = new CustomResult().withResult(result);
 		await next();
@@ -48,11 +35,6 @@ export class AccountController {
 
 	public sendVerify = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const { mobile } = req.body;
-		new CustomValidator()
-			.checkThrows(mobile,
-				{ m: ErrorCodes.ERR_MUST_BE_MOBILE, s: validateStrategy.NON_EMPTY_STRING },
-				{ m: ErrorCodes.ERR_MUST_BE_MOBILE, fn: (val) => this._twnMobileFormat.test(val) }
-			);
 		const opt = new CustomHttpOption()
 			.addHeader('user-agent', req.headers['user-agent']);
 
