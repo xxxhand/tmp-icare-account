@@ -39,3 +39,16 @@ export interface ICustomRedisClient {
 	close(): void;
 	isConnected(): boolean;
 }
+
+export interface smsOptions {
+	host: string;
+	port: number;
+	account: string;
+	password: string;
+	maxTryLimit: TNullable<number>;
+}
+export interface ISMSClient {
+	tryConnect(): Promise<void>;
+	send(phone: string, message: string): Promise<boolean>;
+	close(): Promise<void>;
+}

@@ -4,4 +4,6 @@ export const commonInjectorCodes = {
 	I_HTTP_CLIENT: Symbol('iHttpClient'),
 	I_REDIS_CLIENT: Symbol('iRedisClient'),
 	DEFAULT_REDIS_CLIENT: Symbol('defaultRedisClient'),
+	I_SMS_CLIENT: Symbol('iSMSClient'),
+	DEFAULT_SMS_CLIENT: Symbol('defaultSMSClient'),
 };

@@ -16,6 +16,8 @@ export {
 	IBaseRequest,
 	ICustomHttpClient,
 	ICustomRedisClient,
+	smsOptions,
+	ISMSClient,
 } from './custom-types';
 export { defaultContainer, lazyInject, lazyInjectNamed } from './shared/default-container';
 export { CustomMongooseClient } from './custom-tools/custom-mongoose-client';
