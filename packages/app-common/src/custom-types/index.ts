@@ -48,6 +48,8 @@ export interface smsOptions {
 	maxTryLimit: TNullable<number>;
 }
 export interface ISMSClient {
+	isConnected(): boolean;
+	isLogged(): boolean;
 	tryConnect(): Promise<void>;
 	send(phone: string, message: string): Promise<boolean>;
 	close(): Promise<void>;

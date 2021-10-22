@@ -139,19 +139,29 @@ export class CustomSMSClient implements ISMSClient {
 	constructor(opt: smsOptions) {
 		this._smsOptions = opt;
 	}
+	isConnected(): boolean {
+		return this._connected;
+	}
+
+	isLogged(): boolean {
+		return this._isLogged;
+	}
 
 	tryConnect = async (): Promise<void> => {
 		await this._retryConnect();
 		await this._login();
 	}
+
 	send = async (phone: string, message: string): Promise<boolean> => {
 		throw new Error('Method not implemented.');
 	}
+
 	close = async (): Promise<void> => {
 		this._connected = false;
 		this._isLogged = false;
 		this._isSendingSMS = false;
 		if (this._client) {
+			LOGGER.info(`Close client`);
 			this._client.removeAllListeners();
 			this._client.end();
 		}
@@ -159,10 +169,11 @@ export class CustomSMSClient implements ISMSClient {
 
 	private _retryConnect = async (times: number = 1): Promise<boolean> => {
 		LOGGER.info(`Retry connect SMS server ${times}`);
-		if (this._connected) {
+		if (this.isConnected()) {
 			return true;
 		}
 		try {
+			this._connected = false;
 			this._client = net.createConnection({ host: this._smsOptions.host, port: this._smsOptions.port });
 			await pEvent(this._client, 'ready', { timeout: this._EVENT_TIMEOUT });
 			this._connected = true;
@@ -180,6 +191,10 @@ export class CustomSMSClient implements ISMSClient {
 		if (!this._client) {
 			throw new Error(`[SMS] Socket client is null`);
 		}
+		if (this.isLogged()) {
+			return;
+		}
+		this._isLogged = false;
 		const loginBuf = this._buildLoginBuffer();
 		this._client.write(loginBuf);
 		const returnBuf = await pEvent(this._client, 'data', { timeout: this._EVENT_TIMEOUT });
@@ -202,7 +217,7 @@ export class CustomSMSClient implements ISMSClient {
 			.chars(MsgColumes.MsgSet, 100)
 			.chars(MsgColumes.MsgContent, 160, 'ucs2');
 
-		s.allocate();
+		const buff = s.allocate().buffer();
 		s.fields[MsgColumes.MsgType] = MsgType.Login;
 		s.fields[MsgColumes.MsgCoding] = MsgCoding.UCS2;
 		s.fields[MsgColumes.MsgPriority] = 0;
@@ -212,12 +227,12 @@ export class CustomSMSClient implements ISMSClient {
 		s.fields[MsgColumes.MsgSet] = `${this._smsOptions.account}${this._STR_NUL}${this._smsOptions.password}${this._STR_NUL}`;
 		s.fields[MsgColumes.MsgContent] = '0';
 
-		return s.allocate().buffer();
+		return buff;
 
 	}
 
 	private _buildMessageBuffer = (phone: string, message: string): Buffer => {
-
+		return Buffer.from('I am message');
 	}
 
 	private _parseReturnData = (buf: Buffer): IReturnData => {
@@ -234,9 +249,11 @@ export class CustomSMSClient implements ISMSClient {
 			.chars(ReturnDataColumns.RetContent, 160);
 
 		s.setBuffer(buf);
-		const code = s.get(ReturnDataColumns.RetCode);
-		const content = s.get(ReturnDataColumns.RetContent);
-		return { code, content };
+
+		return {
+			code: s.get(ReturnDataColumns.RetCode),
+			content: s.get(ReturnDataColumns.RetContent),
+		};
 	}
 
 }
