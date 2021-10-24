@@ -85,7 +85,9 @@ try {
 		_config.DEFAULT_REDIS.DB_NAME = Number.parseInt(<string>process.env.X_DEF_REDIS_DB_NAME, 10);
 	}
 } catch (ex) {
-	LOGGER.error(ex.stack);
+	if (ex instanceof Error) {
+		LOGGER.error(ex.stack);
+	}
 	throw ex;
 }
 

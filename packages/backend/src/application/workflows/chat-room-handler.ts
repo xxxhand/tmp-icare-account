@@ -59,7 +59,7 @@ export class ChatRoomHandler extends AbstractSocketHandler {
 
 			return next();
 		} catch (ex) {
-			return next(ex);
+			return next(CustomError.fromInstance(ex));
 		}
 	}
 	public onConnection = (socket: Socket): void => {
@@ -81,7 +81,7 @@ export class ChatRoomHandler extends AbstractSocketHandler {
 					}
 					res.withResult(oRoom);
 				} catch (ex) {
-					res.withErrorCode(this.makeError(ex));
+					res.withErrorCode(CustomError.getCode(CustomError.fromInstance(ex).type));
 				}
 				socket.emit(RoomEvents.JOIN_ROOM_RES, res);
 			});

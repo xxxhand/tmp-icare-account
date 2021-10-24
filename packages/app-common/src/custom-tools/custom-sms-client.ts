@@ -4,6 +4,7 @@ import pEvent from 'p-event';
 import { smsOptions, ISMSClient, TNullable } from '../custom-types';
 import { logger as LOGGER } from '../custom-tools/custom-logger';
 import { CustomValidator, validateStrategy } from '../custom-tools/custom-validator';
+import { CustomError } from '../custom-models/custom-error';
 
 //#region Defined for internal usage
 /** 訊息型態 */
@@ -179,7 +180,8 @@ export class CustomSMSClient implements ISMSClient {
 			this._connected = true;
 			return true;
 		} catch (ex) {
-			LOGGER.error(`Retry connect SMS server fail ${ex.stack}`);
+			const err = CustomError.fromInstance(ex);
+			LOGGER.error(`Retry connect SMS server fail ${err.stack}`);
 			if (times === this._smsOptions.maxTryLimit) {
 				return this._retryConnect(times + 1);
 			}

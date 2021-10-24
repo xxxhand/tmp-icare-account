@@ -77,20 +77,15 @@ const _codeMap = new Map<string, ICodeObject>()
 	});
 
 export class CustomError extends Error {
-	public type: string;
-	public code: number;
-	public message: string;
-	public name: string;
-	public httpStatus: number;
+	public type: string = '';
+	public code: number = 99999;
+	public message: string = '';
+	public name: string = '';
+	public httpStatus: number = 400;
 
 	constructor(codeType: string, replaceString: string = '') {
 		super();
-		const err = CustomError.getCode(codeType);
-		this.type = err.code != 99999 ? codeType : ErrorCodes.ERR_EXCEPTION;
-		this.code = err.code;
-		this.message = replaceString || err.message;
-		this.name = this.constructor.name;
-		this.httpStatus = err.httpStatus;
+		this.useError(codeType, replaceString);
 	}
 
 	public isSuccess(): boolean {
@@ -99,6 +94,16 @@ export class CustomError extends Error {
 
 	public isException(): boolean {
 		return Object.is(this.code, 99999);
+	}
+
+	public useError(codeType: string, replaceString: string = ''): CustomError {
+		const err = CustomError.getCode(codeType);
+		this.type = err.code != 99999 ? codeType : ErrorCodes.ERR_EXCEPTION;
+		this.code = err.code;
+		this.message = replaceString || err.message;
+		this.name = this.constructor.name;
+		this.httpStatus = err.httpStatus;
+		return this;
 	}
 
 	public static mergeCodes(codes: Array<ICodeObject>): void {
@@ -127,5 +132,16 @@ export class CustomError extends Error {
 			};
 		}
 		return err;
+	}
+
+	public static fromInstance(ex: unknown): CustomError {
+		if (ex instanceof CustomError) {
+			return ex;
+		}
+		let msg = 'Not caught error instance...';
+		if (ex instanceof Error) {
+			msg = ex.message;
+		}
+		return new CustomError('', msg);
 	}
 }

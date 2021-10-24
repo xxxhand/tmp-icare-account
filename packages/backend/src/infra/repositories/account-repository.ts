@@ -40,8 +40,11 @@ export class AccountRepository implements IAccountRepository {
 			account.id = obj._id.toString();
 			return account;
 		} catch (ex) {
-			LOGGER.error(`DB operations fail, ${ex.stack}`);
-			throw new CustomError(cmmErr.ERR_EXEC_DB_FAIL);
+			const err = CustomError.fromInstance(ex)
+				.useError(cmmErr.ERR_EXEC_DB_FAIL);
+
+			LOGGER.error(`DB operations fail, ${err.stack}`);
+			throw err;
 		}
 
 	}
@@ -58,8 +61,11 @@ export class AccountRepository implements IAccountRepository {
 			const cnt = await col.countDocuments(q);
 			return cnt > 0;
 		} catch (ex) {
-			LOGGER.error(`DB operations fail, ${ex.stack}`);
-			throw new CustomError(cmmErr.ERR_EXEC_DB_FAIL);
+			const err = CustomError.fromInstance(ex)
+				.useError(cmmErr.ERR_EXEC_DB_FAIL);
+
+			LOGGER.error(`DB operations fail, ${err.stack}`);
+			throw err;
 		}
 	}
 

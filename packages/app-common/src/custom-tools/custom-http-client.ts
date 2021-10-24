@@ -39,10 +39,11 @@ export class CustomHttpClient implements ICustomHttpClient {
 			}
 			return result;
 		} catch (ex) {
-			const code = CustomError.getCode(cmmErr.ERR_EXEC_HTTP_ERROR);
+			const err = CustomError.fromInstance(ex)
+				.useError(cmmErr.ERR_EXEC_HTTP_ERROR);
 			return new CustomResult()
-				.withCode(code.code)
-				.withMessage(ex.message);
+				.withCode(err.code)
+				.withMessage(err.message);
 		}
 	}
 	tryPostForm = async (option: TNullable<CustomHttpOption>): Promise<CustomResult> => {
@@ -79,10 +80,11 @@ export class CustomHttpClient implements ICustomHttpClient {
 			}
 			return result;
 		} catch (ex) {
-			const code = CustomError.getCode(cmmErr.ERR_EXEC_HTTP_ERROR);
+			const err = CustomError.fromInstance(ex)
+				.useError(cmmErr.ERR_EXEC_HTTP_ERROR);
 			return new CustomResult()
-				.withCode(code.code)
-				.withMessage(ex.message);
+				.withCode(err.code)
+				.withMessage(err.message);
 		}
 	}
 }
