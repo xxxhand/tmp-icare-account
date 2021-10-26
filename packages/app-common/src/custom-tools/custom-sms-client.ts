@@ -154,7 +154,44 @@ export class CustomSMSClient implements ISMSClient {
 	}
 
 	send = async (phone: string, message: string): Promise<boolean> => {
-		throw new Error('Method not implemented.');
+		if (!CustomValidator.nonEmptyString(phone)) {
+			throw new Error('Parameter `phone` is empty.');
+		}
+		if (!/^09\d{8}$/.test(phone)) {
+			throw new Error('Parameter `phone` is invalid.');
+		}
+		if (!CustomValidator.nonEmptyString(message)) {
+			throw new Error('Parameter `message` is empty.');
+		}
+		if (!this._client) {
+			throw new Error('Client does not connect to a socket server.');
+		}
+		if (!this.isConnected()) {
+			throw new Error('This socket has been ended.');
+		}
+		if (!this.isLogged()) {
+			throw new Error('Client does not login.');
+		}
+		if (this._isSendingSMS) {
+			throw new Error('Client is sending another sms.');
+		}
+		try {
+			this._isSendingSMS = true;
+			const smsMsgBuffer = this._buildMessageBuffer(phone, message);
+			this._client.write(smsMsgBuffer);
+			const retMsg = await pEvent(this._client, 'data', { timeout: this._EVENT_TIMEOUT });
+			const { code, content } = this._parseReturnData(retMsg);
+			this._isSendingSMS = false;
+			if (code === RetCodeSend.Success) {
+				LOGGER.info(`DefaultSMSClient - Send sms to ${phone} successfully. MessageID=${content}`);
+			} else {
+				LOGGER.error(`DefaultSMSClient - Send sms to ${phone} failed. retCode=${code}, retContent=${content}`);
+			}
+			return code === RetCodeSend.Success;
+		} catch (error) {
+			this._isSendingSMS = false;
+			throw error;
+		}
 	}
 
 	close = async (): Promise<void> => {
@@ -230,11 +267,36 @@ export class CustomSMSClient implements ISMSClient {
 		s.fields[MsgColumes.MsgContent] = '0';
 
 		return buff;
-
 	}
 
 	private _buildMessageBuffer = (phone: string, message: string): Buffer => {
-		return Buffer.from('I am message');
+		// return Buffer.from('I am message');
+		const sendMsgStruct = new Struct()
+			.word8(MsgColumes.MsgType)
+			.word8(MsgColumes.MsgCoding)
+			.word8(MsgColumes.MsgPriority)
+			.word8(MsgColumes.MsgCountryCode)
+			.word8(MsgColumes.MsgSetLen)
+			.word8(MsgColumes.MsgContentLen)
+			.chars(MsgColumes.MsgSet, 100)
+			.chars(MsgColumes.MsgContent, 160, 'ucs2');
+
+		const sendMsgBuffer = sendMsgStruct.allocate().buffer();
+		sendMsgStruct.fields[MsgColumes.MsgType] = MsgType.Send;
+		sendMsgStruct.fields[MsgColumes.MsgCoding] = MsgCoding.UCS2;
+		sendMsgStruct.fields[MsgColumes.MsgPriority] = 0;
+		sendMsgStruct.fields[MsgColumes.MsgCountryCode] = 0;
+		sendMsgStruct.fields[MsgColumes.MsgSetLen] = (phone + this._STR_NUL + this._SEND_TYPE + this._STR_NUL + this._RESEND_TIMEOUT + this._STR_NUL).length;
+		sendMsgStruct.fields[MsgColumes.MsgContentLen] = message.length * 2;
+		sendMsgStruct.fields[MsgColumes.MsgSet] = phone + this._STR_NUL + this._SEND_TYPE + this._STR_NUL + this._RESEND_TIMEOUT + this._STR_NUL;
+		sendMsgStruct.fields[MsgColumes.MsgContent] = message;
+		// msgContent le to be
+		for (let i = 106; i < 266; i += 2) {
+			const tmp = sendMsgBuffer[i];
+			sendMsgBuffer[i] = sendMsgBuffer[i + 1];
+			sendMsgBuffer[i + 1] = tmp;
+		}
+		return sendMsgBuffer;
 	}
 
 	private _parseReturnData = (buf: Buffer): IReturnData => {
