@@ -11,6 +11,8 @@ tags:
     description: 認證
   - name: Account
     description: 帳號
+  - name: LineApp
+    description: Line 應用相關
 paths:
   /account/check:
     post:
