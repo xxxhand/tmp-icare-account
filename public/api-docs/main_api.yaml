@@ -4,7 +4,7 @@ info:
   description: ""
   version: 0.0.3
 servers:
-  - url: http://localhost:9000/api
+  - url: http://localhost:9000/line_io/api/v1
     description: The api server
 tags:
   - name: Credential
@@ -16,6 +16,7 @@ tags:
 paths:
   /account/check:
     post:
+      deprecated: true
       tags:
         - Account
       summary: 檢查帳號存在與否
@@ -62,7 +63,235 @@ paths:
             "*/*":
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-      x-codegen-request-body-name: body                  
+      x-codegen-request-body-name: body
+  /accounts:
+    post:
+      tags:
+        - LineApp
+      summary: 使用者資料驗證/註冊
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - phone
+                - name
+                - password
+                - code
+                - lineId
+              type: object
+              properties:
+                phone:
+                  type: string
+                  description: 手機號碼              
+                name:
+                  type: string
+                  description: 姓名
+                password:
+                  type: string
+                  description: 密碼
+                code:
+                  type: string
+                  description: 驗證碼
+                lineId:
+                  type: string
+                  description: 使用者line id                                 
+                inviter:
+                  type: string
+                  description: 邀請者手機
+      responses:
+        "200":
+          description: Success
+          content:
+            "*/*":
+              schema:
+                type: object
+                properties:
+                  traceId:
+                    type: string
+                  code:
+                    type: integer
+                    format: Int32
+                  message:
+                    type: string
+                  result:
+                    $ref: "#/components/schemas/ResponseEmptyResult"
+        "400":
+          description: Bad request
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/BasicErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/BasicErrorResponse"
+      x-codegen-request-body-name: body
+  /accounts/{phone}:
+    patch:
+      tags:
+        - LineApp
+      summary: 變更使用者資料
+      parameters:
+        - name: phone
+          in: path
+          description: 使用者手機號碼，應為10碼且以"0"開頭
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+                - password
+                - lineId
+              type: object
+              properties:         
+                name:
+                  type: string
+                  description: 姓名
+                password:
+                  type: string
+                  description: 密碼
+                lineId:
+                  type: string
+                  description: 使用者line id                                 
+                inviter:
+                  type: string
+                  description: 邀請者手機
+      responses:
+        "200":
+          description: Success
+          content:
+            "*/*":
+              schema:
+                type: object
+                properties:
+                  traceId:
+                    type: string
+                  code:
+                    type: integer
+                    format: Int32
+                  message:
+                    type: string
+                  result:
+                    $ref: "#/components/schemas/ResponseEmptyResult"
+        "400":
+          description: Bad request
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/BasicErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/BasicErrorResponse"
+      x-codegen-request-body-name: body
+  /codes/{phone}:
+    put:
+      tags:
+        - LineApp
+      summary: 發送SMS驗證碼
+      parameters:
+        - name: phone
+          in: path
+          description: 使用者手機號碼，應為10碼且以"0"開頭
+          schema:
+            type: string
+          required: true
+      requestBody:
+      responses:
+        "200":
+          description: Success
+          content:
+            "*/*":
+              schema:
+                type: object
+                properties:
+                  traceId:
+                    type: string
+                  code:
+                    type: integer
+                    format: Int32
+                  message:
+                    type: string
+                  result:
+                    $ref: "#/components/schemas/ResponseEmptyResult"
+        "400":
+          description: Bad request
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/BasicErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/BasicErrorResponse"
+      x-codegen-request-body-name: body
+  /login:
+    post:
+      tags:
+        - LineApp
+      summary: 登入iCare
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - account
+                - password
+                - lineId
+              type: object
+              properties:
+                account:
+                  type: string
+                  description: iCare帳號
+                password:
+                  type: string
+                  description: 密碼
+                lineId:
+                  type: string
+                  description: 使用者line id 
+      responses:
+        "200":
+          description: Success
+          content:
+            "*/*":
+              schema:
+                type: object
+                properties:
+                  traceId:
+                    type: string
+                  code:
+                    type: integer
+                    format: Int32
+                  message:
+                    type: string
+                  result:
+                    $ref: "#/components/schemas/ResponseEmptyResult"
+        "400":
+          description: Bad request
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/BasicErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/BasicErrorResponse"
+      x-codegen-request-body-name: body
   /client-auth:
     post:
       deprecated: true
@@ -128,6 +357,21 @@ components:
       scheme: bearer
   schemas:
     # 預設
+    BasicErrorResponse:
+      type: object
+      properties:
+        traceId:
+          type: string
+          example: kjsadfkjsakjdf-asdfsdfskdf00-ksdnfkls
+        code:
+          type: integer
+          example: 10001
+        message:
+          type: string
+          example: OOps!! Something wrong
+        result:
+          type: object
+          nullable: true
     ErrorResponse:
       type: object
       properties:
