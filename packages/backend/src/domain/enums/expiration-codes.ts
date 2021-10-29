@@ -1,3 +1,3 @@
 export enum ExpirationCodes {
-  VERIFY_CODE = 60 * 60 * 24,
+  VERIFY_CODE = 60 * 1 * 1,
 }

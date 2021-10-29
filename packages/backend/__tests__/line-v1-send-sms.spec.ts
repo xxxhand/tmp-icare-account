@@ -72,6 +72,7 @@ describe('Line io send SMS spec', () => {
 			const c = await codeRepo.findOneByPhone(p) as CodeEntity;
 			expect(c).toBeTruthy();
 			expect(c.code).toHaveLength(4);
+			expect(c.hasExpired()).toBe(false);
 		});
 		test('success w/ existed phone', async () => {
 			const endpoint = util.format(_ENDPOINT, existPhone.phone);
@@ -83,6 +84,7 @@ describe('Line io send SMS spec', () => {
 			expect(c).toBeTruthy();
 			expect(c.code).toHaveLength(4);
 			expect(c.code).not.toBe(existPhone.code);
+			expect(c.hasExpired()).toBe(false);
 		});
 	});
 });
