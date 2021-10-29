@@ -50,7 +50,7 @@
     "ioredis": "^4.27.2",
     "lodash": "^4.17.21",
     "mongodb": "^3.6.9",
-    "mongoose": "^5.11.8",
+    "mongoose": "^6.0.12",
     "node-fetch": "^2.6.1",
     "p-event": "^4.2.0",
     "reflect-metadata": "^0.1.13",
