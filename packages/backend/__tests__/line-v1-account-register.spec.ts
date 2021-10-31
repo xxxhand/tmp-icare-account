@@ -263,6 +263,9 @@ describe('Line io - register account spec', () => {
 			const acc = await accountRepo.findOneByAccount(bb.phone) as AccountEntity;
 			expect(acc).toBeTruthy();
 			expect(CustomValidator.nonEmptyString(acc.lineId)).toBe(true);
+			const code = await codeRepo.findOneByPhone(acc.account) as CodeEntity;
+			expect(code).toBeTruthy();
+			expect(code.completed).toBe(true);
 		});
 	});
 });

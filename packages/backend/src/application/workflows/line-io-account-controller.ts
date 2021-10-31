@@ -52,6 +52,9 @@ export class LineIOAccountController {
 		oAccount.lineId = <string>mReq?.lineId;
 		await this._accountRepo?.save(oAccount);
 
+		oCode.complete();
+		await this._codeRepo?.save(oCode);
+
 		res.locals['result'] = new CustomResult();
 		await next();
 	}

@@ -90,6 +90,7 @@ export class CodeRepository implements ICodeRepository {
 		e.code = doc.verifyCode;
 		e.expiresAt = new Date(doc.verifyCodeDeadline).getTime();
 		e.refreshAt = new Date(doc.verifyCodeCreateTime).getTime();
+		e.completed = doc.verifyComplete;
 		return e;
 	}
 
