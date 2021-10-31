@@ -1,7 +1,5 @@
 import { smsOptions } from '../src/custom-types';
 import { CustomSMSClient } from '../src/custom-tools/custom-sms-client';
-import { CustomUtils } from '../src/custom-tools/custom-utils';
-
 
 describe.skip('SMS client test', () => {
 	const opt: smsOptions = {

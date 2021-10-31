@@ -3,14 +3,9 @@ import * as util from 'util';
 import { mock } from 'jest-mock-extended';
 import {
 	CustomError,
-	CustomUtils,
 	defaultContainer,
 	IMongooseClient,
 	commonInjectorCodes,
-	ErrorCodes,
-	HttpCodes,
-	ICustomHttpClient,
-	CustomResult,
 	ISMSClient,
 } from '@demo/app-common';
 import { AppInitializer } from '../src/bootstrap/app-initializer';

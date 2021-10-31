@@ -3,7 +3,7 @@ import { Struct } from 'struct';
 import pEvent from 'p-event';
 import { smsOptions, ISMSClient, TNullable } from '../custom-types';
 import { logger as LOGGER } from '../custom-tools/custom-logger';
-import { CustomValidator, validateStrategy } from '../custom-tools/custom-validator';
+import { CustomValidator } from '../custom-tools/custom-validator';
 import { CustomError } from '../custom-models/custom-error';
 
 //#region Defined for internal usage
