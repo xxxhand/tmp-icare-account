@@ -33,6 +33,11 @@ describe('Line io send SMS spec', () => {
 		await db.clearData();
 		agentClient = superTest.agent(new App().app);
 		codeRepo = defaultContainer.get(InjectorCodes.I_CODE_REPO);
+
+		const smsClient = mock<ISMSClient>();
+		smsClient.tryConnect.mockResolvedValue();
+		smsClient.send.mockResolvedValue(true);
+		defaultContainer.rebind<ISMSClient>(commonInjectorCodes.I_SMS_CLIENT).toConstantValue(smsClient);
 	});
 	afterAll(async () => {
 		await db.clearData();

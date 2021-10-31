@@ -77,10 +77,16 @@ export class AppInitializer {
 			.to(CustomHttpClient)
 			.inSingletonScope();
 
+		const smsClient = new CustomSMSClient({
+			host: defConf.DEFAULT_SMS.HOST,
+			port: defConf.DEFAULT_SMS.PORT,
+			account: defConf.DEFAULT_SMS.ACCOUNT,
+			password: defConf.DEFAULT_SMS.PASSWORD,
+			maxTryLimit: 3,
+		});
 		defaultContainer
 			.bind<ISMSClient>(commonInjectorCodes.I_SMS_CLIENT)
-			.to(CustomSMSClient)
-			.inSingletonScope();
+			.toConstantValue(smsClient);
 
 		/** repositories */
 		defaultContainer

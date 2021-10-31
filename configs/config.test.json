@@ -23,5 +23,11 @@
 		"EXPIRES_IN": 345600,
 		"DOMAIN_NAME": ".compal-health.com",
 		"NAME": "icaretest115.sid"
+	},
+  "DEFAULT_SMS": {
+		"HOST": "",
+		"PORT": 0,
+		"ACCOUNT": "",
+		"PASSWORD": ""
 	}
 }
