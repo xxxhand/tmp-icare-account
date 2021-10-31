@@ -16,6 +16,7 @@ export enum ErrorCodes {
 	ERR_CODE_WRONG = 'ERR_CODE_WRONG',
 	ERR_LINE_ID_EMPTY = 'ERR_LINE_ID_EMPTY',
 	ERR_ACCOUNT_EXISTS = 'ERR_ACCOUNT_EXISTS',
+	ERR_ACCOUNT_NOT_EXIST = 'ERR_ACCOUNT_NOT_EXIST',
 };
 
 const _codes: Array<ICodeObject> = [
@@ -98,6 +99,12 @@ const _codes: Array<ICodeObject> = [
 		code: 10006,
 		httpStatus: 400,
 		message: '帳號已被註冊',
+	},
+	{
+		alias: ErrorCodes.ERR_ACCOUNT_NOT_EXIST,
+		code: 10007,
+		httpStatus: 400,
+		message: '帳號不存在',
 	}
 ];
 

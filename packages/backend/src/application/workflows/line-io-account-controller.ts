@@ -22,6 +22,7 @@ import { ICodeRepository } from '../../domain/repositories/i-code-repository';
 import { AccountEntity } from '../../domain/entities/account-entity';
 import { IAccountRepository } from '../../domain/repositories/i-account-repository';
 import { LineIORegisterRequest } from '../../domain/value-objects/line-io-register-request';
+import { LineIOUpdateAccountRequest } from '../../domain/value-objects/line-io-update-account-request';
 
 export class LineIOAccountController {
 
@@ -50,6 +51,7 @@ export class LineIOAccountController {
 		oAccount.salt = CustomUtils.generateRandomString(9);
 		oAccount.password = CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt);
 		oAccount.lineId = <string>mReq?.lineId;
+		oAccount.phone = <string>mReq?.phone;
 		await this._accountRepo?.save(oAccount);
 
 		oCode.complete();
@@ -60,7 +62,22 @@ export class LineIOAccountController {
 	}
 
 	public update = async (req: ICustomExpressRequest, res: Response, next: NextFunction): Promise<void> => {
+		const mReq = CustomClassBuilder.build(LineIOUpdateAccountRequest, req.body);
+		mReq?.usePhone(req.params.phone).checkRequired();
+		LOGGER.info(`Find account ${mReq?.phone}`);
+		const oAccount = await this._accountRepo?.findOneByAccount(<string>mReq?.phone);
+		if (!oAccount) {
+			LOGGER.info(`Account ${mReq?.phone} not found`);
+			throw new CustomError(domainErr.ERR_ACCOUNT_NOT_EXIST);
+		}
+		oAccount.name = <string>mReq?.name;
+		oAccount.salt = CustomUtils.generateRandomString(9);
+		oAccount.password = CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt);
+		oAccount.lineId = <string>mReq?.lineId;
+		await this._accountRepo?.save(oAccount);
 
+		res.locals['result'] = new CustomResult();
+		await next();
 	}
 
 	public login = async (req: ICustomExpressRequest, res: Response, next: NextFunction): Promise<void> => {

@@ -6,7 +6,6 @@ import {
 	IMongooseClient,
 	commonInjectorCodes,
 	CustomUtils,
-	CustomValidator,
 } from '@demo/app-common';
 import { AppInitializer } from '../src/bootstrap/app-initializer';
 import { App } from '../src/bootstrap/app';
@@ -262,7 +261,12 @@ describe('Line io - register account spec', () => {
 			expect(res.status).toBe(200);
 			const acc = await accountRepo.findOneByAccount(bb.phone) as AccountEntity;
 			expect(acc).toBeTruthy();
-			expect(CustomValidator.nonEmptyString(acc.lineId)).toBe(true);
+			expect(acc.account).toBe(defBody.phone);
+			expect(acc.phone).toBe(defBody.phone);
+			expect(acc.name).toBe(defBody.name);
+			expect(acc.nickname).toBe(defBody.name);
+			expect(acc.lineId).toBe(defBody.lineId);
+			
 			const code = await codeRepo.findOneByPhone(acc.account) as CodeEntity;
 			expect(code).toBeTruthy();
 			expect(code.completed).toBe(true);

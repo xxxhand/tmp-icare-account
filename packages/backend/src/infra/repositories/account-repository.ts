@@ -109,7 +109,7 @@ export class AccountRepository implements IAccountRepository {
 			return undefined;
 		}
 		const o = CustomClassBuilder.build(AccountEntity, doc) as AccountEntity;
-		o.id = doc._id;
+		o.id = doc._id.toString();
 		return o;
 	}
 
