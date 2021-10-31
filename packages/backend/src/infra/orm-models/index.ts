@@ -3,6 +3,7 @@ import { IClientCredentialDocument, clientCredentialModelName, clientCredentialS
 import { IChatRoomDocument, chatRoomModelName, chatRoomSchema } from './chat-room';
 import { ITokenDocument, tokenModelName, tokenSchema } from './token';
 import { IAccountDocument, accountModelName, accountSchema } from './account';
+import { IVerificationDocument, verificationModelName, verificationSchema } from './verification';
 
 export function load(client?: IMongooseClient): void {
 	if (!client) {
@@ -12,6 +13,7 @@ export function load(client?: IMongooseClient): void {
 	client.registerModel<IChatRoomDocument>(chatRoomModelName, chatRoomSchema);
 	client.registerModel<ITokenDocument>(tokenModelName, tokenSchema);
 	client.registerModel<IAccountDocument>(accountModelName, accountSchema);
+	client.registerModel<IVerificationDocument>(verificationModelName, verificationSchema);
 }
 
 
@@ -19,4 +21,6 @@ export {
 	IClientCredentialDocument,
 	IChatRoomDocument,
 	ITokenDocument,
+	IAccountDocument,
+	IVerificationDocument,
 };

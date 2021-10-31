@@ -7,6 +7,7 @@ import { AppInterceptor } from './app-interceptor';
 import * as appTracer from './app-request-tracer';
 import { V1Router } from '../application/workflows/v1-router';
 import { MockRouter } from '../application/workflows/mock-router';
+import { LineIOV1Router } from '../application/workflows/line-io-v1-router';
 
 const _PUBLIC_PATH = '../../../../public';
 
@@ -38,6 +39,10 @@ export class App {
 		this._app.use(appTracer.handle());
 		this._app.use(AppInterceptor.beforeHandler);
 		this._app.use(AppInterceptor.authenticationHandler);
+		
+		const lineIOV1Router = new LineIOV1Router();
+		this._app.use(lineIOV1Router.prefix, lineIOV1Router.router);
+		
 		const v1Router = new V1Router();
 		this._app.use(v1Router.prefix, v1Router.router);
 
@@ -56,6 +61,7 @@ export class App {
 			oStore = new MongoStore({
 				client: mClient.getNativeClient(),
 				ttl: defConf.SESSION_CONFIGS.EXPIRES_IN,
+				autoRemove: 'disabled',
 			});
 		} catch (ex) {
 			LOGGER.warn('Mongo client is null, use memory store for session');

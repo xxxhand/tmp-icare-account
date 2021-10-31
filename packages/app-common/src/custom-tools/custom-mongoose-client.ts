@@ -14,10 +14,8 @@ export class CustomMongooseClient implements IMongooseClient {
 	private _numberOfRetries = 0;
 	private _defaultOptions: ConnectOptions = {
 		maxPoolSize: 10,
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
 		connectTimeoutMS: 3 * 1000,
-		useCreateIndex: true,
+		autoIndex: true,
 	};
 	private _ignoreClearEnvs: Array<string> = [];
 
@@ -66,7 +64,7 @@ export class CustomMongooseClient implements IMongooseClient {
 				LOGGER.info('DB opened...');
 				res();
 			});
-			this._conn?.once('error', (err) => {
+			this._conn?.once('error', (err: any) => {
 				rej(err);
 			});
 		});

@@ -23,6 +23,12 @@ export class AppIgnoreHandler {
 
 	static rules: Array<IIgnoreSetting> = [
 		{
+			group: /^\/line_io\/./,
+			regs: [
+				{ p: /.\/w+/, m: [SupportMethods.GET, SupportMethods.PATCH, SupportMethods.POST, SupportMethods.PUT] }
+			],
+		},
+		{
 			group: /^\/api\/v[1-9]+\/account\/./,
 			regs: [
 				{ p: /.\/check$/, m: [SupportMethods.POST] }

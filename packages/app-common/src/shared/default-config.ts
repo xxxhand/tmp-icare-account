@@ -32,6 +32,12 @@ interface IConfig {
 		DOMAIN_NAME: string,
 		NAME: string,
 	},
+	DEFAULT_SMS: {
+		HOST: string,
+		PORT: number,
+		ACCOUNT: string,
+		PASSWORD: string,
+	}
 }
 
 LOGGER.info(`Run on environment ${customArgvs.env}`);

@@ -3,4 +3,5 @@ export enum ModelCodes {
     CHAT_ROOM = 'ChatRoom',
     TOKEN = 'Token',
     ACCOUNT = 'Account',
+    VERIFICATION = 'Verification',
 };

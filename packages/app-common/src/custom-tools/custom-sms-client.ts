@@ -202,17 +202,19 @@ export class CustomSMSClient implements ISMSClient {
 			LOGGER.info(`Close client`);
 			this._client.removeAllListeners();
 			this._client.end();
+			this._client = null;
 		}
 	}
 
 	private _retryConnect = async (times: number = 1): Promise<boolean> => {
-		LOGGER.info(`Retry connect SMS server ${times}`);
 		if (this.isConnected()) {
 			return true;
 		}
+		LOGGER.info(`Retry connect SMS server ${times}`);
 		try {
 			this._connected = false;
 			this._client = net.createConnection({ host: this._smsOptions.host, port: this._smsOptions.port });
+			this._client.on('close', this.close);
 			await pEvent(this._client, 'ready', { timeout: this._EVENT_TIMEOUT });
 			this._connected = true;
 			return true;
@@ -319,5 +321,4 @@ export class CustomSMSClient implements ISMSClient {
 			content: s.get(ReturnDataColumns.RetContent),
 		};
 	}
-
 }

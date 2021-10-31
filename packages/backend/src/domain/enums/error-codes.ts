@@ -10,6 +10,7 @@ export enum ErrorCodes {
 	NOT_EXIST_CHAT_ROOM = 'NOT_EXIST_CHAT_ROOM',
 	CHAT_ROOM_IS_CLOSE = 'CHAT_ROOM_IS_CLOSE',
 	//#endregion
+	ERR_PHONE_FORMAT_WRONG = 'ERR_PHONE_FORMAT_WRONG',
 	ERR_ACCOUNT_EXISTS = 'ERR_ACCOUNT_EXISTS',
 };
 
@@ -58,6 +59,12 @@ const _codes: Array<ICodeObject> = [
 		code: 2004,
 	},
 	//#endregion
+	{
+		alias: ErrorCodes.ERR_PHONE_FORMAT_WRONG,
+		code: 10001,
+		httpStatus: 400,
+		message: '電話格式錯誤',
+	},
 	{
 		alias: 'ERR_ACCOUNT_EXISTS',
 		code: 10004,

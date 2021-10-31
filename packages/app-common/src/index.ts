@@ -24,6 +24,7 @@ export { CustomMongooseClient } from './custom-tools/custom-mongoose-client';
 export { CustomRedisClient } from './custom-tools/custom-redis-client';
 export { CustomClassBuilder } from './custom-tools/custom-class-builder';
 export { CustomHttpClient } from './custom-tools/custom-http-client';
+export { CustomSMSClient } from './custom-tools/custom-sms-client';
 export { CustomJsonProp } from './custom-tools/custom-decorators/custom-json-prop';
 export { commonInjectorCodes } from './shared/default-mapping-codes';
 export { defaultConfig as defConf } from './shared/default-config';

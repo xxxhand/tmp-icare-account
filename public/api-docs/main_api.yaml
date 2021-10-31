@@ -206,7 +206,6 @@ paths:
           schema:
             type: string
           required: true
-      requestBody:
       responses:
         "200":
           description: Success

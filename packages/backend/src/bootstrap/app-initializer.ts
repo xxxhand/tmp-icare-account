@@ -9,6 +9,8 @@ import {
 	CustomHttpClient,
 	ICustomRedisClient,
 	CustomRedisClient,
+	ISMSClient,
+	CustomSMSClient,
 } from '@demo/app-common';
 import { InjectorCodes } from '../domain/enums/injector-codes';
 import { AbstractSocketHandler } from '../application/workflows/abstract-socket-handler';
@@ -26,6 +28,8 @@ import { ILunaRepository } from '../domain/repositories/i-luna-repository';
 import { LunaRepository } from '../infra/repositories/luna-repository';
 import { IAccountService } from '../application/services/interfaces/i-account-service';
 import { AccountService } from '../application/services/account-service';
+import { ICodeRepository } from '../domain/repositories/i-code-repository';
+import { CodeRepository } from '../infra/repositories/code-repository';
 
 export class AppInitializer {
 
@@ -34,7 +38,7 @@ export class AppInitializer {
 		const client = new CustomMongooseClient(defMongo.URI, {
 			user: defMongo.USER,
 			pass: defMongo.PASS,
-			poolSize: defMongo.POOL_SIZE,
+			maxPoolSize: defMongo.POOL_SIZE,
 			dbName: defMongo.DB_NAME,
 		});
 		client.ignoreClearEnvironments('production', 'prod');
@@ -73,6 +77,17 @@ export class AppInitializer {
 			.to(CustomHttpClient)
 			.inSingletonScope();
 
+		const smsClient = new CustomSMSClient({
+			host: defConf.DEFAULT_SMS.HOST,
+			port: defConf.DEFAULT_SMS.PORT,
+			account: defConf.DEFAULT_SMS.ACCOUNT,
+			password: defConf.DEFAULT_SMS.PASSWORD,
+			maxTryLimit: 3,
+		});
+		defaultContainer
+			.bind<ISMSClient>(commonInjectorCodes.I_SMS_CLIENT)
+			.toConstantValue(smsClient);
+
 		/** repositories */
 		defaultContainer
 			.bind<IClientRepository>(InjectorCodes.I_CLIENT_REPO).to(ClientRepository).inSingletonScope();
@@ -84,11 +99,13 @@ export class AppInitializer {
 			.bind<IAccountRepository>(InjectorCodes.I_ACCOUNT_REPO).to(AccountRepository).inSingletonScope();
 		defaultContainer
 			.bind<ILunaRepository>(InjectorCodes.I_LUNA_REPO).to(LunaRepository).inSingletonScope();
-			
+		defaultContainer
+			.bind<ICodeRepository>(InjectorCodes.I_CODE_REPO).to(CodeRepository).inSingletonScope();
+
 		/** application services */
 		defaultContainer
 			.bind<IAccountService>(InjectorCodes.I_ACCOUNT_SRV).to(AccountService).inSingletonScope();
-			
+
 		/** socket handlers */
 		defaultContainer
 			.bind<AbstractSocketHandler>(InjectorCodes.ABS_SOCKET_HANDLER)

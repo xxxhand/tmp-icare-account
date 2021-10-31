@@ -23,5 +23,11 @@
 		"EXPIRES_IN": 345600,
 		"DOMAIN_NAME": "",
 		"NAME": "icaretest115.sid"
+	},
+  "DEFAULT_SMS": {
+		"HOST": "202.39.54.130",
+		"PORT": 8000,
+		"ACCOUNT": "89809080",
+		"PASSWORD": "740e2d0a"
 	}
 }
