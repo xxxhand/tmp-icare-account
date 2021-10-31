@@ -42,6 +42,9 @@ describe('Send verify spec', () => {
 
 		oAccount = new AccountEntity();
 		oAccount.account = defBody.mobile;
+		oAccount.name = 'oAccount';
+		oAccount.salt = CustomUtils.generateRandomString(9);
+		oAccount.password = CustomUtils.hashPassword('a123456b', oAccount.salt);
 		oAccount = await accountRepo.save(oAccount) as AccountEntity;
 
 		// rebind mock http client - start
@@ -110,6 +113,9 @@ describe('Send verify spec', () => {
 		beforeAll(async () => {
 			existDBAccount = new AccountEntity();
 			existDBAccount.account = '0987678678';
+			existDBAccount.name = 'existDBAccount';
+			existDBAccount.salt = CustomUtils.generateRandomString(9);
+			existDBAccount.password = CustomUtils.hashPassword('a123456b', existDBAccount.salt);
 			existDBAccount = await accountRepo.save(existDBAccount) as AccountEntity;
 		});
 		test('[10004] Account registered(in Luna)', async () => {

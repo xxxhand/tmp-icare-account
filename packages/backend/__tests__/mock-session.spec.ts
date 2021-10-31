@@ -1,5 +1,5 @@
 import * as superTest from 'supertest';
-import { defaultContainer, IMongooseClient, commonInjectorCodes } from '@demo/app-common';
+import { defaultContainer, IMongooseClient, commonInjectorCodes, CustomUtils } from '@demo/app-common';
 import { AppInitializer } from '../src/bootstrap/app-initializer';
 import { App } from '../src/bootstrap/app';
 
@@ -45,6 +45,7 @@ describe('Mock session test', () => {
 		await agentClient
 			.delete(_ENDPOINT);
 
+		await CustomUtils.sleep(2);
 		res = await agentClient
 			.get(_ENDPOINT);
 

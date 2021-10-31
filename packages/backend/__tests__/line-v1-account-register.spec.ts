@@ -6,6 +6,7 @@ import {
 	IMongooseClient,
 	commonInjectorCodes,
 	CustomUtils,
+	CustomValidator,
 } from '@demo/app-common';
 import { AppInitializer } from '../src/bootstrap/app-initializer';
 import { App } from '../src/bootstrap/app';
@@ -19,11 +20,11 @@ import { ICodeRepository } from '../src/domain/repositories/i-code-repository';
 
 const _ENDPOINT = '/line_io/api/v1/accounts';
 interface IBody {
-	phone?: string;
-	name?: string;
-	password?: string;
-	code?: string;
-	lineId?: string;
+	phone: string;
+	name: string;
+	password: string;
+	code: string;
+	lineId: string;
 }
 
 describe('Line io - register account spec', () => {
@@ -33,7 +34,7 @@ describe('Line io - register account spec', () => {
 	let accountRepo: IAccountRepository;
 	let validCode: CodeEntity;
 	let defBody: IBody = {
-		phone: `0${CustomUtils.generateRandomNumbers(9)}`,
+		phone: `09${CustomUtils.generateRandomNumbers(8)}`,
 		name: 'xxxhand',
 		password: 'nn0989HG',
 		code: '',
@@ -159,32 +160,48 @@ describe('Line io - register account spec', () => {
 	});
 	describe('Validation rules', () => {
 		let expiredCode: CodeEntity;
+		let withNameCode: CodeEntity;
+		let noNameCode: CodeEntity;
 		let accountWithName: AccountEntity;
 		let accountNoName: AccountEntity;
 		beforeAll(async () => {
 			accountWithName = new AccountEntity();
-			accountWithName.account = `0${CustomUtils.generateRandomNumbers(9)}`;
+			accountWithName.account = `09${CustomUtils.generateRandomNumbers(8)}`;
 			accountWithName.name = 'account with name';
 			accountWithName.salt = CustomUtils.generateRandomString(9);
 			accountWithName.password = CustomUtils.hashPassword('a123456b', accountWithName.salt);
 			accountWithName = await accountRepo.save(accountWithName) as AccountEntity;
 
-			accountNoName = CustomUtils.deepClone(accountWithName);
-			accountNoName.id = '';
-			accountNoName.account = `0${CustomUtils.generateRandomNumbers(9)}`;
+			accountNoName = new AccountEntity();
+			accountNoName.account = `09${CustomUtils.generateRandomNumbers(8)}`;
 			accountNoName.name = '';
+			accountNoName.salt = CustomUtils.generateRandomString(9);
+			accountNoName.password = CustomUtils.hashPassword('a123456b', accountNoName.salt);
 			accountNoName = await accountRepo.save(accountNoName) as AccountEntity;
 
 			expiredCode = new CodeEntity();
-			expiredCode.phone = accountNoName.account;
+			expiredCode.phone = `09${CustomUtils.generateRandomNumbers(8)}`;
 			expiredCode.refesh(CustomUtils.generateRandomNumbers(4));
 			expiredCode.expiresAt = Date.now() - (ExpirationCodes.VERIFY_CODE * 1000);
-			expiredCode = await codeRepo.save(expiredCode) as CodeEntity;
+
+			withNameCode = new CodeEntity();
+			withNameCode.phone = accountWithName.account;
+			withNameCode.refesh(CustomUtils.generateRandomNumbers(4));
+
+			noNameCode = new CodeEntity();
+			noNameCode.phone = accountNoName.account;
+			noNameCode.refesh(CustomUtils.generateRandomNumbers(4));
+
+			await Promise.all([
+				codeRepo.save(expiredCode),
+				codeRepo.save(withNameCode),
+				codeRepo.save(noNameCode)
+			]);
 
 		});
 		test('[10004] 驗證碼錯誤(過期)', async () => {
 			const bb = CustomUtils.deepClone(defBody);
-			bb.phone = accountNoName.account;
+			bb.phone = expiredCode.phone;
 			bb.code = expiredCode.code;
 
 			const res = await agentClient
@@ -202,6 +219,7 @@ describe('Line io - register account spec', () => {
 		test('[10006] 帳號已存在且原資料有姓名', async () => {
 			const bb = CustomUtils.deepClone(defBody);
 			bb.phone = accountWithName.account;
+			bb.code = withNameCode.code;
 
 			const res = await agentClient
 				.post(_ENDPOINT)
@@ -218,6 +236,7 @@ describe('Line io - register account spec', () => {
 		test('[10006] 帳號已存在且原資料無姓名', async () => {
 			const bb = CustomUtils.deepClone(defBody);
 			bb.phone = accountNoName.account;
+			bb.code = noNameCode.code;
 
 			const res = await agentClient
 				.post(_ENDPOINT)
@@ -233,7 +252,7 @@ describe('Line io - register account spec', () => {
 		});
 	});
 	describe('Success', () => {
-		test.todo('[success]]', async () => {
+		test('[success]]', async () => {
 			const bb = CustomUtils.deepClone(defBody);
 
 			const res = await agentClient
@@ -241,7 +260,9 @@ describe('Line io - register account spec', () => {
 				.send(bb);
 
 			expect(res.status).toBe(200);
-			
+			const acc = await accountRepo.findOneByAccount(bb.phone) as AccountEntity;
+			expect(acc).toBeTruthy();
+			expect(CustomValidator.nonEmptyString(acc.lineId)).toBe(true);
 		});
 	});
 });

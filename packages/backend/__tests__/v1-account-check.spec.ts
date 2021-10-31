@@ -41,6 +41,9 @@ describe('Account check spec', () => {
 
 		oAccount = new AccountEntity();
 		oAccount.account = defBody.account;
+		oAccount.name = 'account with name';
+		oAccount.salt = CustomUtils.generateRandomString(9);
+		oAccount.password = CustomUtils.hashPassword('a123456b', oAccount.salt);
 		oAccount = await accountRepo.save(oAccount) as AccountEntity;
 		
 		// rebind mock http client - start

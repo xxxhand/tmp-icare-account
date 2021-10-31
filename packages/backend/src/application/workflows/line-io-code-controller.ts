@@ -2,7 +2,6 @@ import { Response, NextFunction, Router } from 'express';
 import { injectable } from 'inversify';
 import * as util from 'util';
 import {
-	CustomClassBuilder,
 	CustomResult,
 	defaultContainer,
 	lazyInject,
@@ -22,7 +21,7 @@ import { ICodeRepository } from '../../domain/repositories/i-code-repository';
 import { CodeEntity } from '../../domain/entities/code-entity';
 
 @injectable()
-export class CodeController {
+export class LineIOCodeController {
 
 	@lazyInject(InjectorCodes.I_CODE_REPO)
 	private _codeRepo: TNullable<ICodeRepository>;
@@ -65,8 +64,8 @@ export class CodeController {
 	}
 
 	public static build(): Router {
-		defaultContainer.bind(CodeController).toSelf().inSingletonScope();
-		const _ctrl = defaultContainer.get(CodeController);
+		defaultContainer.bind(LineIOCodeController).toSelf().inSingletonScope();
+		const _ctrl = defaultContainer.get( LineIOCodeController);
 		const r = Router();
 		r.route('/codes/:phone')
 			.put(handleExpressAsync(_ctrl.sendCode));

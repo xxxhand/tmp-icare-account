@@ -4,8 +4,9 @@ export class AccountEntity {
   valid: boolean = true;
   isLuna: boolean = false;
   name: string = '';
-  nickName: string = '';
+  nickname: string = '';
   password: string = '';
   salt: string = '';
   phone: string = '';
+  lineId: string = '';
 }

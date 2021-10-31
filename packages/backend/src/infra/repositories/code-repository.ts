@@ -25,25 +25,20 @@ export class CodeRepository implements ICodeRepository {
 		this._defaultClient = defaultClient;
 	}
 
+	findOneByPhoneAndCode = async (phone: string, code: string): Promise<TNullable<CodeEntity>> => {
+		if (!CustomValidator.nonEmptyString(phone) || !CustomValidator.nonEmptyString(code)) {
+			return undefined;
+		}
+		return this._findOne({ mobile: phone, verifyCode: code });
+	}
+
 	findOneByPhone = async (phone: string): Promise<TNullable<CodeEntity>> => {
 		if (!CustomValidator.nonEmptyString(phone)) {
 			return undefined;
 		}
-		try {
-			const col = this._defaultClient.getModel<IVerificationDocument>(ModelCodes.VERIFICATION);
-			const q = {
-				mobile: phone,
-			};
-			const doc: IVerificationDocument = await col.findOne(q).lean();
-			return this._transform(doc);
-		} catch (ex) {
-			const err = CustomError.fromInstance(ex)
-				.useError(cmmErr.ERR_EXEC_DB_FAIL);
-
-			LOGGER.error(`DB operations fail, ${err.stack}`);
-			throw err;
-		}
+		return this._findOne({ mobile: phone });
 	}
+
 	save = async (entity: CodeEntity): Promise<TNullable<CodeEntity>> => {
 		if (!entity) {
 			return undefined;
@@ -96,6 +91,20 @@ export class CodeRepository implements ICodeRepository {
 		e.expiresAt = new Date(doc.verifyCodeDeadline).getTime();
 		e.refreshAt = new Date(doc.verifyCodeCreateTime).getTime();
 		return e;
+	}
+
+	private _findOne = async (query: any = {}): Promise<TNullable<CodeEntity>> => {
+		try {
+			const col = this._defaultClient.getModel<IVerificationDocument>(ModelCodes.VERIFICATION);
+			const doc: IVerificationDocument = await col.findOne(query).lean();
+			return this._transform(doc);
+		} catch (ex) {
+			const err = CustomError.fromInstance(ex)
+				.useError(cmmErr.ERR_EXEC_DB_FAIL);
+
+			LOGGER.error(`DB operations fail, ${err.stack}`);
+			throw err;
+		}
 	}
 
 }

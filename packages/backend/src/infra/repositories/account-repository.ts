@@ -24,21 +24,14 @@ export class AccountRepository implements IAccountRepository {
 		this._defaultClient = defaultClient;
 	}
 
-	save = async (account: TNullable<AccountEntity>): Promise<TNullable<AccountEntity>> => {
-		if (!account) {
-			return undefined;
-		}
+	findOneByAccount = async (account: string): Promise<TNullable<AccountEntity>> => {
 		try {
 			const col = this._defaultClient.getModel<IAccountDocument>(ModelCodes.ACCOUNT);
-			let obj = <IAccountDocument>{
-				account: account.account,
-				isLuna: account.isLuna,
-				valid: account.valid,
+			const q = {
+				account,
 			};
-			obj = await col.create(obj);
-
-			account.id = obj._id.toString();
-			return account;
+			const doc: IAccountDocument = await col.findOne(q).lean();
+			return this._transform(doc);
 		} catch (ex) {
 			const err = CustomError.fromInstance(ex)
 				.useError(cmmErr.ERR_EXEC_DB_FAIL);
@@ -46,7 +39,49 @@ export class AccountRepository implements IAccountRepository {
 			LOGGER.error(`DB operations fail, ${err.stack}`);
 			throw err;
 		}
+	}
 
+	save = async (account: TNullable<AccountEntity>): Promise<TNullable<AccountEntity>> => {
+		if (!account) {
+			return undefined;
+		}
+		const col = this._defaultClient.getModel<IAccountDocument>(ModelCodes.ACCOUNT);
+		if (!CustomValidator.nonEmptyString(account.id)) {
+			let obj = <IAccountDocument>{
+				account: account.account,
+				isLuna: account.isLuna,
+				valid: account.valid,
+				name: account.name,
+				nickname: account.nickname,
+				password: account.password,
+				salt: account.salt,
+				phone: account.phone,
+				lineId: account.lineId,
+			};
+			try {
+				obj = await col.create(obj);
+				account.id = obj._id.toString();
+				return account;
+			} catch (ex) {
+				const err = CustomError.fromInstance(ex)
+					.useError(cmmErr.ERR_EXEC_DB_FAIL);
+
+				LOGGER.error(`DB operations fail, ${err.stack}`);
+				throw err;
+			}
+		}
+
+		const upd = <IAccountDocument>{
+			name: account.name,
+			nickname: account.nickname,
+			password: account.password,
+			salt: account.salt,
+			phone: account.phone,
+			lineId: account.lineId,
+		};
+
+		await col.updateOne({ _id: account.id }, { '$set': upd });
+		return account;
 	}
 	checkExist = async (account: string): Promise<boolean> => {
 		if (!CustomValidator.nonEmptyString(account)) {
@@ -69,7 +104,7 @@ export class AccountRepository implements IAccountRepository {
 		}
 	}
 
-	private _transtorm = (doc: TNullable<IAccountDocument>): TNullable<AccountEntity> => {
+	private _transform = (doc: TNullable<IAccountDocument>): TNullable<AccountEntity> => {
 		if (!doc) {
 			return undefined;
 		}

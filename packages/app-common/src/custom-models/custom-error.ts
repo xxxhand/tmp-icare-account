@@ -138,10 +138,12 @@ export class CustomError extends Error {
 		if (ex instanceof CustomError) {
 			return ex;
 		}
-		let msg = 'Not caught error instance...';
+		const err = new CustomError('', 'Not caught error instance...');
 		if (ex instanceof Error) {
-			msg = ex.message;
+			err.stack = ex.stack;
+			err.message = ex.message;
 		}
-		return new CustomError('', msg);
+		
+		return err;
 	}
 }

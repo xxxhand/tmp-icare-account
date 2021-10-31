@@ -1,16 +1,18 @@
 import { Router } from 'express';
-import { CodeController } from './code-controller';
+import { LineIOCodeController } from './line-io-code-controller';
+import { LineIOAccountController } from './line-io-account-controller';
 
 export class LineIOV1Router {
-  public prefix: string = '/line_io/api/v1';
-  public router: Router = Router();
+	public prefix: string = '/line_io/api/v1';
+	public router: Router = Router();
 
-  constructor() {
-  	this._init();
-  }
+	constructor() {
+		this._init();
+	}
 
-  private _init = (): void => {
-  	this.router
-  		.use(CodeController.build());
-  }
+	private _init = (): void => {
+		this.router
+			.use(LineIOAccountController.build())
+			.use(LineIOCodeController.build());
+	}
 }
