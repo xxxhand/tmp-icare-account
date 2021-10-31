@@ -17,7 +17,7 @@ import { ICodeRepository } from '../src/domain/repositories/i-code-repository';
 
 const _ENDPOINT = '/line_io/api/v1/codes/%s';
 
-describe('Line io send SMS spec', () => {
+describe('Line io - send SMS spec', () => {
 	let agentClient: superTest.SuperAgentTest;
 	let db: IMongooseClient;
 	let codeRepo: ICodeRepository;
@@ -39,7 +39,7 @@ describe('Line io send SMS spec', () => {
 		await db.close();
 	});
 	describe('Required fields', () => {
-		test('[10001] Parameter "phone" has worng format', async () => {
+		test('[10001] 手機格式錯誤', async () => {
 			const endpoint = util.format(_ENDPOINT, '096773');
 			const res = await agentClient
 				.put(endpoint);

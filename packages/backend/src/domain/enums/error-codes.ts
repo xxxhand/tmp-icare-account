@@ -11,6 +11,10 @@ export enum ErrorCodes {
 	CHAT_ROOM_IS_CLOSE = 'CHAT_ROOM_IS_CLOSE',
 	//#endregion
 	ERR_PHONE_FORMAT_WRONG = 'ERR_PHONE_FORMAT_WRONG',
+	ERR_NAME_EMPTY = 'ERR_NAME_EMPTY',
+	ERR_PASS_WRONG_FORMAT = 'ERR_PASS_WRONG_FORMAT',
+	ERR_CODE_WRONG = 'ERR_CODE_WRONG',
+	ERR_LINE_ID_EMPTY = 'ERR_LINE_ID_EMPTY',
 	ERR_ACCOUNT_EXISTS = 'ERR_ACCOUNT_EXISTS',
 };
 
@@ -66,8 +70,32 @@ const _codes: Array<ICodeObject> = [
 		message: '電話格式錯誤',
 	},
 	{
-		alias: 'ERR_ACCOUNT_EXISTS',
+		alias: ErrorCodes.ERR_NAME_EMPTY,
+		code: 10002,
+		httpStatus: 400,
+		message: '姓名不得為空',
+	},
+	{
+		alias: ErrorCodes.ERR_PASS_WRONG_FORMAT,
+		code: 10003,
+		httpStatus: 400,
+		message: '密碼格式錯誤',
+	},
+	{
+		alias: ErrorCodes.ERR_CODE_WRONG,
 		code: 10004,
+		httpStatus: 400,
+		message: '驗證碼錯誤',
+	},
+	{
+		alias: ErrorCodes.ERR_LINE_ID_EMPTY,
+		code: 10005,
+		httpStatus: 400,
+		message: 'Line id不得為空',
+	},
+	{
+		alias: ErrorCodes.ERR_ACCOUNT_EXISTS,
+		code: 10006,
 		httpStatus: 400,
 		message: '帳號已被註冊',
 	}
