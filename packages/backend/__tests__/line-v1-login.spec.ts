@@ -32,7 +32,7 @@ describe('Line io - login spec', () => {
 	let oAccount: AccountEntity;
 	const defBody: IBody = {
 		account: '',
-		password: '',
+		password: CustomUtils.makeSha256('a123456b'),
 		lineId: CustomUtils.generateRandomString(16),
 	};
 	beforeAll(async () => {
@@ -47,11 +47,10 @@ describe('Line io - login spec', () => {
 		oAccount.account = '0987654321';
 		oAccount.name = 'account with name';
 		oAccount.salt = CustomUtils.generateRandomString(9);
-		oAccount.password = CustomUtils.hashPassword('a123456b', oAccount.salt);
+		oAccount.password = CustomUtils.hashPassword(defBody.password, oAccount.salt);
 		oAccount = await accountRepo.save(oAccount) as AccountEntity;
 
 		defBody.account = oAccount.account;
-		defBody.password = 'a123456b';
 
 	});
 	afterAll(async () => {
@@ -130,6 +129,7 @@ describe('Line io - login spec', () => {
 	});
 	describe('Success', () => {
 		let existedLunaAccount: AccountEntity;
+		let existedPwd = CustomUtils.makeSha256('a123456b');
 		beforeAll(async () => {
 			existedLunaAccount = new AccountEntity();
 			existedLunaAccount.account = 'luna_xxxhandFromLuna';
@@ -137,7 +137,7 @@ describe('Line io - login spec', () => {
 			existedLunaAccount.nickname = 'hand in luna';
 			existedLunaAccount.isLuna = true;
 			existedLunaAccount.salt = CustomUtils.generateRandomString(9);
-			existedLunaAccount.password = CustomUtils.hashPassword('a123456b', existedLunaAccount.salt);
+			existedLunaAccount.password = CustomUtils.hashPassword(existedPwd, existedLunaAccount.salt);
 			existedLunaAccount.lineId = 'aabc';
 			existedLunaAccount = await accountRepo.save(existedLunaAccount) as AccountEntity;
 		});
@@ -160,7 +160,7 @@ describe('Line io - login spec', () => {
 		test.skip('[Luna] 第二次登入，不應建立/變更資料', async () => {
 			const bb: IBody = {
 				account: 'xxxhandFromLuna',
-				password: 'aA123456',
+				password: existedPwd,
 				lineId: CustomUtils.generateRandomString(16),
 			};
 			const res = await agentClient

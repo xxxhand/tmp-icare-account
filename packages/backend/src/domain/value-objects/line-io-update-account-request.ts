@@ -19,12 +19,7 @@ export class LineIOUpdateAccountRequest implements IBaseRequest<LineIOUpdateAcco
 				{ m: ErrorCodes.ERR_PHONE_FORMAT_WRONG, fn: (val) => /^09\d{8}$/.test(val) }
 			)
 			.nonEmptyStringThrows(this.name, ErrorCodes.ERR_NAME_EMPTY)
-			.checkThrows(this.password,
-				{ m: ErrorCodes.ERR_PASS_WRONG_FORMAT, s: validateStrategy.NON_EMPTY_STRING },
-				{ m: ErrorCodes.ERR_PASS_WRONG_FORMAT, fn: (val) => /^(?=.{8,})/.test(val) },
-				{ m: ErrorCodes.ERR_PASS_WRONG_FORMAT, fn: (val) => /^(?=.*[0-9])/.test(val) },
-				{ m: ErrorCodes.ERR_PASS_WRONG_FORMAT, fn: (val) => /^(?=.*[a-z])/.test(val) }
-			)
+			.nonEmptyStringThrows(this.password, ErrorCodes.ERR_PASS_WRONG_FORMAT)
 			.nonEmptyStringThrows(this.lineId, ErrorCodes.ERR_LINE_ID_EMPTY);
 
 		return this;

@@ -1,5 +1,6 @@
 
 import * as superTest from 'supertest';
+import * as crypto from 'crypto';
 import {
 	CustomError,
 	defaultContainer,
@@ -35,7 +36,7 @@ describe('Line io - register account spec', () => {
 	let defBody: IBody = {
 		phone: `09${CustomUtils.generateRandomNumbers(8)}`,
 		name: 'xxxhand',
-		password: 'nn0989HG',
+		password: CustomUtils.makeSha256('nn0989HG'),
 		code: '',
 		lineId: CustomUtils.generateRandomString(16),
 	};
@@ -95,22 +96,6 @@ describe('Line io - register account spec', () => {
 		test('[10003] 密碼格式錯誤(空白)', async () => {
 			const bb = CustomUtils.deepClone(defBody);
 			bb.password = '';
-
-			const res = await agentClient
-				.post(_ENDPOINT)
-				.send(bb);
-
-			const err = new CustomError(domainErr.ERR_PASS_WRONG_FORMAT);
-			expect(res.status).toBe(err.httpStatus);
-			expect(res.body).toEqual({
-				traceId: expect.any(String),
-				code: err.code,
-				message: err.message,
-			});
-		});
-		test('[10003] 密碼格式錯誤(不符密碼原則，原則為英+數，不得包含特殊符號字元)', async () => {
-			const bb = CustomUtils.deepClone(defBody);
-			bb.password = '786545#';
 
 			const res = await agentClient
 				.post(_ENDPOINT)
