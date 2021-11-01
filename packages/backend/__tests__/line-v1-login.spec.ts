@@ -17,6 +17,7 @@ import { ErrorCodes as domainErr } from '../src/domain/enums/error-codes';
 import { InjectorCodes } from '../src/domain/enums/injector-codes';
 import { AccountEntity } from '../src/domain/entities/account-entity';
 import { IAccountRepository } from '../src/domain/repositories/i-account-repository';
+import { ILoginLunaUser } from '../src/infra/types/luna-api-types';
 
 const _ENDPOINT = '/line_io/api/v1/login';
 interface IBody {
@@ -52,6 +53,10 @@ describe('Line io - login spec', () => {
 
 		defBody.account = oAccount.account;
 
+		//#region Mock luna login api call
+		const failResult = new CustomResult()
+			.withResult();
+		//#endregion
 	});
 	afterAll(async () => {
 		await db.clearData();

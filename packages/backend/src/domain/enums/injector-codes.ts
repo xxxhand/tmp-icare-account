@@ -8,4 +8,5 @@ export enum InjectorCodes {
   I_LUNA_REPO = 'iLunaRepository',
   I_ACCOUNT_SRV = 'iAccountService',
   I_CODE_REPO = 'iCodeRepository',
+  LUNA_HTTP_CLIENT = 'lunaHttpClient',
 };

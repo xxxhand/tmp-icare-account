@@ -30,6 +30,7 @@ import { IAccountService } from '../application/services/interfaces/i-account-se
 import { AccountService } from '../application/services/account-service';
 import { ICodeRepository } from '../domain/repositories/i-code-repository';
 import { CodeRepository } from '../infra/repositories/code-repository';
+import { LunaHttpClient } from '../infra/tools/luna-http-client';
 
 export class AppInitializer {
 
@@ -74,8 +75,13 @@ export class AppInitializer {
 		/** tools */
 		defaultContainer
 			.bind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT)
-			.to(CustomHttpClient)
-			.inSingletonScope();
+			.toConstantValue(new CustomHttpClient())
+			.whenTargetNamed(commonInjectorCodes.DEFAULT_HTTP_CLIENT);
+		
+		defaultContainer
+			.bind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT)
+			.toConstantValue(new LunaHttpClient())
+			.whenTargetNamed(InjectorCodes.LUNA_HTTP_CLIENT);
 
 		const smsClient = new CustomSMSClient({
 			host: defConf.DEFAULT_SMS.HOST,
