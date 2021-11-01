@@ -1,6 +1,6 @@
 interface IBaseResponse {
   success: boolean;
-  error?: any;
+  errors?: any;
 }
 
 export interface IAccountExistResponse extends IBaseResponse {

@@ -1,5 +1,4 @@
-import { Response, NextFunction, Router } from 'express';
-import { injectable } from 'inversify';
+import { Request, Response, NextFunction, Router } from 'express';
 import * as util from 'util';
 import {
 	CustomResult,
@@ -14,16 +13,19 @@ import {
 	commonInjectorCodes,
 	CustomError,
 	CustomClassBuilder,
+	CustomHttpOption,
 } from '@demo/app-common';
-import { handleExpressAsync, ICustomExpressRequest } from '../application-types';
+import { handleExpressAsync } from '../application-types';
 import { ErrorCodes as domainErr } from '../../domain/enums/error-codes';
 import { InjectorCodes } from '../../domain/enums/injector-codes';
 import { ICodeRepository } from '../../domain/repositories/i-code-repository';
 import { AccountEntity } from '../../domain/entities/account-entity';
 import { IAccountRepository } from '../../domain/repositories/i-account-repository';
+import { ILunaRepository } from '../../domain/repositories/i-luna-repository';
 import { LineIORegisterRequest } from '../../domain/value-objects/line-io-register-request';
 import { LineIOUpdateAccountRequest } from '../../domain/value-objects/line-io-update-account-request';
 import { LineIOLoginRequest } from '../../domain/value-objects/line-io-login-request';
+import { ILoginLunaUser } from '../../infra/types/luna-api-types';
 
 export class LineIOAccountController {
 
@@ -31,8 +33,10 @@ export class LineIOAccountController {
 	private _codeRepo: TNullable<ICodeRepository>;
 	@lazyInject(InjectorCodes.I_ACCOUNT_REPO)
 	private _accountRepo: TNullable<IAccountRepository>;
+	@lazyInject(InjectorCodes.I_LUNA_REPO)
+	private _lunaRepo: TNullable<ILunaRepository>;
 
-	public create = async (req: ICustomExpressRequest, res: Response, next: NextFunction): Promise<void> => {
+	public create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const mReq = CustomClassBuilder.build(LineIORegisterRequest, req.body)?.checkRequired();
 		LOGGER.info(`Find account ${mReq?.phone} and verify code ${mReq?.code}`);
 		const oCode = await this._codeRepo?.findOneByPhoneAndCode(<string>mReq?.phone, <string>mReq?.code);
@@ -62,7 +66,7 @@ export class LineIOAccountController {
 		await next();
 	}
 
-	public update = async (req: ICustomExpressRequest, res: Response, next: NextFunction): Promise<void> => {
+	public update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const mReq = CustomClassBuilder.build(LineIOUpdateAccountRequest, req.body);
 		mReq?.usePhone(req.params.phone).checkRequired();
 		LOGGER.info(`Find account ${mReq?.phone}`);
@@ -81,17 +85,39 @@ export class LineIOAccountController {
 		await next();
 	}
 
-	public login = async (req: ICustomExpressRequest, res: Response, next: NextFunction): Promise<void> => {
+	public login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const mReq = CustomClassBuilder.build(LineIOLoginRequest, req.body)?.checkRequired();
 		LOGGER.info(`Account ${mReq?.account} login...`);
-		// TODO: Login luna
 
-		const oAccount = await this._accountRepo?.findOneByAccount(<string>mReq?.account);
-		if (!oAccount) {
-			LOGGER.info(`Account ${mReq?.account} not found in iLearn..`);
+		let inLuna = false;
+		let accountStr = <string>mReq?.account;
+		const opt = new CustomHttpOption()
+			.addHeader('user-agent', req.headers['user-agent']);
+		const oUser = await this._lunaRepo?.login(<string>mReq?.account, <string>mReq?.password, opt) as ILoginLunaUser;
+		if (oUser) {
+			inLuna = true;
+			accountStr = `luna_${mReq?.account}`;
+		}
+		LOGGER.info(`Find account from db using ${accountStr}`);
+		let oAccount = await this._accountRepo?.findOneByAccount(accountStr) as AccountEntity;
+		if (!inLuna && !oAccount) {
+			LOGGER.info(`Account ${mReq?.account} not found..`);
 			throw new CustomError(domainErr.ERR_ACCOUNT_PASS_WRONG);
 		}
 
+		if (inLuna && !oAccount) {
+			oAccount = new AccountEntity();
+			oAccount.account = accountStr;
+			oAccount.isLuna = true;
+			oAccount.name = oUser.name;
+			oAccount.nickname = oUser.name;
+			oAccount.phone = oUser.mobile;
+			oAccount.salt = CustomUtils.generateRandomString(9);
+			oAccount.password = CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt);
+		}
+
+		// TODO: compare password
+		
 		oAccount.lineId = <string>mReq?.lineId;
 		await this._accountRepo?.save(oAccount);
 

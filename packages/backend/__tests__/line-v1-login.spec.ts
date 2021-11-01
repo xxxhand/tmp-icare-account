@@ -17,13 +17,13 @@ import { ErrorCodes as domainErr } from '../src/domain/enums/error-codes';
 import { InjectorCodes } from '../src/domain/enums/injector-codes';
 import { AccountEntity } from '../src/domain/entities/account-entity';
 import { IAccountRepository } from '../src/domain/repositories/i-account-repository';
-import { ILoginLunaUser } from '../src/infra/types/luna-api-types';
+import { ILoginLunaUser, ILunaLoginResult } from '../src/infra/types/luna-api-types';
 
 const _ENDPOINT = '/line_io/api/v1/login';
 interface IBody {
-  account: string;
-  password: string;
-  lineId: string;
+	account: string;
+	password: string;
+	lineId: string;
 };
 
 describe('Line io - login spec', () => {
@@ -31,6 +31,8 @@ describe('Line io - login spec', () => {
 	let db: IMongooseClient;
 	let accountRepo: IAccountRepository;
 	let oAccount: AccountEntity;
+	let existedLunaAccount: AccountEntity;
+	let existedPwd = CustomUtils.makeSha256('a123456b');
 	const defBody: IBody = {
 		account: '',
 		password: CustomUtils.makeSha256('a123456b'),
@@ -53,9 +55,62 @@ describe('Line io - login spec', () => {
 
 		defBody.account = oAccount.account;
 
+		existedLunaAccount = new AccountEntity();
+		existedLunaAccount.account = 'luna_xxxhandFromLuna';
+		existedLunaAccount.name = 'xxxhand in luna';
+		existedLunaAccount.nickname = 'hand in luna';
+		existedLunaAccount.isLuna = true;
+		existedLunaAccount.salt = CustomUtils.generateRandomString(9);
+		existedLunaAccount.password = CustomUtils.hashPassword(existedPwd, existedLunaAccount.salt);
+		existedLunaAccount.lineId = 'aabc';
+		existedLunaAccount.phone = '0987654345';
+		existedLunaAccount = await accountRepo.save(existedLunaAccount) as AccountEntity;
+
 		//#region Mock luna login api call
 		const failResult = new CustomResult()
-			.withResult();
+			.withResult(JSON.stringify({
+				success: false,
+				errors: {
+					account: {
+						message: '帳號密碼不符',
+					},
+				},
+			}));
+		const inLunaResultOnce = new CustomResult()
+			.withResult(JSON.stringify({
+				success: true,
+				data: {
+					name: 'handFromLuna',
+					photo: CustomUtils.generateUUIDV4(),
+					birthDate: new Date(),
+					mobile: `09${CustomUtils.generateRandomNumbers(8)}`,
+					personalId: 'Q123211234',
+					gender: 0,
+				},
+			}));
+		const inLunaResultTwice = new CustomResult()
+			.withResult(JSON.stringify({
+				success: true,
+				data: {
+					name: 'xxxhandFromLuna',
+					photo: CustomUtils.generateUUIDV4(),
+					birthDate: new Date(),
+					mobile: `09${CustomUtils.generateRandomNumbers(8)}`,
+					personalId: 'Q123211234',
+					gender: 0,
+				},
+			}));
+
+		const http = mock<ICustomHttpClient>();
+		http.tryPostJson
+			.mockResolvedValueOnce(failResult)
+			.mockResolvedValueOnce(inLunaResultOnce)
+			.mockResolvedValueOnce(inLunaResultTwice)
+			.mockResolvedValueOnce(failResult);
+		defaultContainer
+			.rebind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT)
+			.toConstantValue(http)
+			.whenTargetNamed(InjectorCodes.LUNA_HTTP_CLIENT);
 		//#endregion
 	});
 	afterAll(async () => {
@@ -133,20 +188,7 @@ describe('Line io - login spec', () => {
 		});
 	});
 	describe('Success', () => {
-		let existedLunaAccount: AccountEntity;
-		let existedPwd = CustomUtils.makeSha256('a123456b');
-		beforeAll(async () => {
-			existedLunaAccount = new AccountEntity();
-			existedLunaAccount.account = 'luna_xxxhandFromLuna';
-			existedLunaAccount.name = 'xxxhand in luna';
-			existedLunaAccount.nickname = 'hand in luna';
-			existedLunaAccount.isLuna = true;
-			existedLunaAccount.salt = CustomUtils.generateRandomString(9);
-			existedLunaAccount.password = CustomUtils.hashPassword(existedPwd, existedLunaAccount.salt);
-			existedLunaAccount.lineId = 'aabc';
-			existedLunaAccount = await accountRepo.save(existedLunaAccount) as AccountEntity;
-		});
-		test.skip('[Luna] 第一次登入，應建立資料', async () => {
+		test('[Luna] 第一次登入，應建立資料', async () => {
 			const bb: IBody = {
 				account: 'handFromLuna',
 				password: 'aA123456',
@@ -162,7 +204,7 @@ describe('Line io - login spec', () => {
 			expect(acc.isLuna).toBe(true);
 			expect(acc.lineId).toBe(bb.lineId);
 		});
-		test.skip('[Luna] 第二次登入，不應建立/變更資料', async () => {
+		test('[Luna] 第二次登入，僅變更line id', async () => {
 			const bb: IBody = {
 				account: 'xxxhandFromLuna',
 				password: existedPwd,
@@ -177,6 +219,8 @@ describe('Line io - login spec', () => {
 			expect(acc).toBeTruthy();
 			expect(acc.isLuna).toBe(true);
 			expect(acc.lineId).toBe(bb.lineId);
+			expect(acc.name).toBe(existedLunaAccount.name);
+			expect(acc.phone).toBe(existedLunaAccount.phone);
 		});
 		test('[iLearn]', async () => {
 			const res = await agentClient
