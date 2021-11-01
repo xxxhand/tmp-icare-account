@@ -23,6 +23,7 @@ import { AccountEntity } from '../../domain/entities/account-entity';
 import { IAccountRepository } from '../../domain/repositories/i-account-repository';
 import { LineIORegisterRequest } from '../../domain/value-objects/line-io-register-request';
 import { LineIOUpdateAccountRequest } from '../../domain/value-objects/line-io-update-account-request';
+import { LineIOLoginRequest } from '../../domain/value-objects/line-io-login-request';
 
 export class LineIOAccountController {
 
@@ -81,7 +82,21 @@ export class LineIOAccountController {
 	}
 
 	public login = async (req: ICustomExpressRequest, res: Response, next: NextFunction): Promise<void> => {
+		const mReq = CustomClassBuilder.build(LineIOLoginRequest, req.body)?.checkRequired();
+		LOGGER.info(`Account ${mReq?.account} login...`);
+		// TODO: Login luna
 
+		const oAccount = await this._accountRepo?.findOneByAccount(<string>mReq?.account);
+		if (!oAccount) {
+			LOGGER.info(`Account ${mReq?.account} not found in iLearn..`);
+			throw new CustomError(domainErr.ERR_ACCOUNT_PASS_WRONG);
+		}
+
+		oAccount.lineId = <string>mReq?.lineId;
+		await this._accountRepo?.save(oAccount);
+
+		res.locals['result'] = new CustomResult();
+		await next();
 	}
 
 	public static build(): Router {

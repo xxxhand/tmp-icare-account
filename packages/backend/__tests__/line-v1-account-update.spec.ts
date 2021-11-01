@@ -154,5 +154,6 @@ describe('Line io - update account spec', () => {
 			expect(acc.nickname).toBe(defAccount.nickname);
 			expect(acc.lineId).toBe(defBody.lineId);
 		});
+		test.todo('Switch line rich menu');
 	});
 });

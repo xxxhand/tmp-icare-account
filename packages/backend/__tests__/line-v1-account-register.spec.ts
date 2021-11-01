@@ -271,5 +271,6 @@ describe('Line io - register account spec', () => {
 			expect(code).toBeTruthy();
 			expect(code.completed).toBe(true);
 		});
+		test.todo('Switch line rich menu');
 	});
 });
