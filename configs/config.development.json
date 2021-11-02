@@ -31,7 +31,9 @@
 		"PASSWORD": "740e2d0a"
 	},
   "DEFAULT_LINE": {
-		"ACCESS_TOKEN": "",
-		"SECRET": ""
+		"ACCESS_TOKEN": "aabc",
+		"SECRET": "ccde",
+    "RICH_MENUS": [],
+		"CHANNEL_ID": "ffgh"
 	}
 }

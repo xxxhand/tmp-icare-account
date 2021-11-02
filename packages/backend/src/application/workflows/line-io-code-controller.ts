@@ -8,8 +8,6 @@ import {
 	LOGGER,
 	CustomValidator,
 	validateStrategy,
-	ISMSClient,
-	commonInjectorCodes,
 	CustomError,
 } from '@demo/app-common';
 import { handleExpressAsync } from '../application-types';
@@ -17,13 +15,14 @@ import { ErrorCodes as domainErr } from '../../domain/enums/error-codes';
 import { InjectorCodes } from '../../domain/enums/injector-codes';
 import { ICodeRepository } from '../../domain/repositories/i-code-repository';
 import { CodeEntity } from '../../domain/entities/code-entity';
+import { INotifyservice } from '../../infra/services/interfaces/i-notify-service';
 
 export class LineIOCodeController {
 
 	@lazyInject(InjectorCodes.I_CODE_REPO)
 	private _codeRepo: TNullable<ICodeRepository>;
-	@lazyInject(commonInjectorCodes.I_SMS_CLIENT)
-	private _smsClient: TNullable<ISMSClient>;
+	@lazyInject(InjectorCodes.I_NOFIFY_SRV)
+	private _notifyService: TNullable<INotifyservice>;
 
 	private _twnMobileFormat = /^09\d{8}$/;
 	private _smsTemplate = '這是驗證碼%s';
@@ -45,16 +44,7 @@ export class LineIOCodeController {
 		oCode.refesh(CustomUtils.generateRandomNumbers(4));
 		await this._codeRepo?.save(oCode);
 
-		try {
-			await this._smsClient?.tryConnect();
-			const isSended = await this._smsClient?.send(oCode.phone, util.format(this._smsTemplate, oCode.code));
-			LOGGER.info(`Send SMS to ${phone} result ${isSended}`);
-		} catch (ex) {
-			const err = CustomError.fromInstance(ex);
-			LOGGER.error(`Send SMS to ${phone} Fail ${err.stack}`);
-			throw err;
-		}
-
+		await this._notifyService?.sendSMS(oCode.phone, util.format(this._smsTemplate, oCode.code));
 
 		res.locals['result'] = new CustomResult();
 		await next();

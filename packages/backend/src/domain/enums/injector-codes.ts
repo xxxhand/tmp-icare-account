@@ -9,4 +9,5 @@ export enum InjectorCodes {
   I_ACCOUNT_SRV = 'iAccountService',
   I_CODE_REPO = 'iCodeRepository',
   LUNA_HTTP_CLIENT = 'lunaHttpClient',
+  I_NOFIFY_SRV = 'iNotifyService',
 };

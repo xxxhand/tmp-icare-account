@@ -41,6 +41,8 @@ interface IConfig {
 	DEFAULT_LINE: {
 		ACCESS_TOKEN: string,
 		SECRET: string,
+		RICH_MENUS: string[],
+		CHANNEL_ID: string,
 	},
 }
 

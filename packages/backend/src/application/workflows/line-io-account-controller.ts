@@ -111,12 +111,8 @@ export class LineIOAccountController {
 			oAccount.password = CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt);
 		}
 
-		// 僅iLearn用戶比對密碼
-		if (!oAccount.isLuna) {
-			const pwd = CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt);
-			if (!CustomUtils.isEqual(oAccount.password, pwd)) {
-				throw new CustomError(domainErr.ERR_ACCOUNT_PASS_WRONG);
-			}
+		if (!oAccount.passwordEqualsTo(CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt))) {
+			throw new CustomError(domainErr.ERR_ACCOUNT_PASS_WRONG);
 		}
 		
 		oAccount.lineId = <string>mReq?.lineId;
