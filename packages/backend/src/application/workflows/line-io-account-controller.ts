@@ -19,7 +19,7 @@ import { ILunaRepository } from '../../domain/repositories/i-luna-repository';
 import { LineIORegisterRequest } from '../../domain/value-objects/line-io-register-request';
 import { LineIOUpdateAccountRequest } from '../../domain/value-objects/line-io-update-account-request';
 import { LineIOLoginRequest } from '../../domain/value-objects/line-io-login-request';
-import { ILoginLunaUser } from '../../infra/types/luna-api-types';
+import { ILunaLoginData } from '../../infra/types/luna-api-types';
 
 export class LineIOAccountController {
 
@@ -87,7 +87,7 @@ export class LineIOAccountController {
 		let accountStr = <string>mReq?.account;
 		const opt = new CustomHttpOption()
 			.addHeader('user-agent', req.headers['user-agent']);
-		const oUser = await this._lunaRepo?.login(<string>mReq?.account, <string>mReq?.password, opt) as ILoginLunaUser;
+		const oUser = await this._lunaRepo?.login(<string>mReq?.account, <string>mReq?.password, opt) as ILunaLoginData;
 		if (oUser) {
 			inLuna = true;
 			accountStr = `luna_${mReq?.account}`;
@@ -104,9 +104,9 @@ export class LineIOAccountController {
 			oAccount = new AccountEntity();
 			oAccount.account = accountStr;
 			oAccount.isLuna = true;
-			oAccount.name = oUser.name;
-			oAccount.nickname = oUser.name;
-			oAccount.phone = oUser.mobile;
+			oAccount.name = oUser.user.name;
+			oAccount.nickname = oUser.user.name;
+			oAccount.phone = oUser.user.mobile;
 			oAccount.salt = CustomUtils.generateRandomString(9);
 			oAccount.password = CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt);
 		}

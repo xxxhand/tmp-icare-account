@@ -80,24 +80,28 @@ describe('Line io - login spec', () => {
 			.withResult(JSON.stringify({
 				success: true,
 				data: {
-					name: 'handFromLuna',
-					photo: CustomUtils.generateUUIDV4(),
-					birthDate: new Date(),
-					mobile: `09${CustomUtils.generateRandomNumbers(8)}`,
-					personalId: 'Q123211234',
-					gender: 0,
+					user: {
+						name: 'handFromLuna',
+						photo: CustomUtils.generateUUIDV4(),
+						birthDate: new Date(),
+						mobile: `09${CustomUtils.generateRandomNumbers(8)}`,
+						personalId: 'Q123211234',
+						gender: 0,
+					},
 				},
 			}));
 		const inLunaResultTwice = new CustomResult()
 			.withResult(JSON.stringify({
 				success: true,
 				data: {
-					name: 'xxxhandFromLuna',
-					photo: CustomUtils.generateUUIDV4(),
-					birthDate: new Date(),
-					mobile: `09${CustomUtils.generateRandomNumbers(8)}`,
-					personalId: 'Q123211234',
-					gender: 0,
+					user: {
+						name: 'xxxhandFromLuna',
+						photo: CustomUtils.generateUUIDV4(),
+						birthDate: new Date(),
+						mobile: `09${CustomUtils.generateRandomNumbers(8)}`,
+						personalId: 'Q123211234',
+						gender: 0,
+					},
 				},
 			}));
 

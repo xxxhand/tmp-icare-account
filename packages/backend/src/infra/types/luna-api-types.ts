@@ -18,12 +18,12 @@ export interface ILoginLunaUser {
   gender: number;
 }
 
-interface ILunaLoginData {
+export interface ILunaLoginData {
   user: ILoginLunaUser;
   redirectURL: string;
   token: string;
 }
 
 export interface ILunaLoginResult extends IBaseResponse {
-  data?: ILoginLunaUser;
+  data?: ILunaLoginData;
 }

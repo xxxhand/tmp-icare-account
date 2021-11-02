@@ -11,7 +11,7 @@ import {
 } from '@demo/app-common';
 import { InjectorCodes } from '../../domain/enums/injector-codes';
 import { ILunaRepository } from '../../domain/repositories/i-luna-repository';
-import { IAccountExistResponse, ILoginLunaUser, ILunaLoginResult } from '../types/luna-api-types';
+import { IAccountExistResponse, ILunaLoginResult, ILunaLoginData } from '../types/luna-api-types';
 
 @injectable()
 export class LunaRepository implements ILunaRepository {
@@ -23,7 +23,7 @@ export class LunaRepository implements ILunaRepository {
 		this._httpClient = httpClient;
 	}
 
-	login = async (account: string, password: string, requestOptions: CustomHttpOption): Promise<TNullable<ILoginLunaUser>> => {
+	login = async (account: string, password: string, requestOptions: CustomHttpOption): Promise<TNullable<ILunaLoginData>> => {
 		if (!CustomValidator.nonEmptyString(account) || !CustomValidator.nonEmptyString(password)) {
 			return undefined;
 		}
@@ -45,7 +45,7 @@ export class LunaRepository implements ILunaRepository {
 				LOGGER.error(`Not logged in luna ${apiResult.result}`);
 				return undefined;
 			}
-			return msg.data as ILoginLunaUser;
+			return msg.data;
 
 		} catch (ex) {
 			const err = CustomError.fromInstance(ex);
