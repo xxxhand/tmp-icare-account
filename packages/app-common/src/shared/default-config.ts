@@ -37,7 +37,11 @@ interface IConfig {
 		PORT: number,
 		ACCOUNT: string,
 		PASSWORD: string,
-	}
+	},
+	DEFAULT_LINE: {
+		ACCESS_TOKEN: string,
+		SECRET: string,
+	},
 }
 
 LOGGER.info(`Run on environment ${customArgvs.env}`);

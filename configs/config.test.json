@@ -29,5 +29,9 @@
 		"PORT": 0,
 		"ACCOUNT": "",
 		"PASSWORD": ""
+	},
+  "DEFAULT_LINE": {
+		"ACCESS_TOKEN": "",
+		"SECRET": ""
 	}
 }

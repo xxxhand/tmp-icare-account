@@ -29,5 +29,9 @@
 		"PORT": 8000,
 		"ACCOUNT": "89809080",
 		"PASSWORD": "740e2d0a"
+	},
+  "DEFAULT_LINE": {
+		"ACCESS_TOKEN": "",
+		"SECRET": ""
 	}
 }
