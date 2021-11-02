@@ -106,4 +106,22 @@ export class CustomUtils {
 			.update(password)
 			.digest('hex');
 	}
+
+	public static makeSha256(str: string): string {
+		if (typeof str !== 'string') {
+			return '';
+		}
+		if (!str || str.length === 0) {
+			return '';
+		}
+		return crypto
+			.createHash('sha256')
+			.update(str)
+			.digest('hex')
+			.toString();
+	}
+
+	public static isEqual(var1: any, var2: any): boolean {
+		return lodash.isEqual(var1, var2);
+	}
 }

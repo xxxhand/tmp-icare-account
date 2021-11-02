@@ -29,7 +29,7 @@ describe('Line io - update account spec', () => {
 	let defAccount: AccountEntity;
 	let defBody: IBody = {
 		name: 'xxxhand',
-		password: 'nn0989HG',
+		password: CustomUtils.makeSha256('nn0989HG'),
 		lineId: CustomUtils.generateRandomString(16),
 	};
 	beforeAll(async () => {
@@ -75,23 +75,6 @@ describe('Line io - update account spec', () => {
 		test('[10003] 密碼格式錯誤(空白)', async () => {
 			const bb = CustomUtils.deepClone(defBody);
 			bb.password = '';
-
-			const endpoint = util.format(_ENDPOINT, defAccount.account);
-			const res = await agentClient
-				.patch(endpoint)
-				.send(bb);
-
-			const err = new CustomError(domainErr.ERR_PASS_WRONG_FORMAT);
-			expect(res.status).toBe(err.httpStatus);
-			expect(res.body).toEqual({
-				traceId: expect.any(String),
-				code: err.code,
-				message: err.message,
-			});
-		});
-		test('[10003] 密碼格式錯誤(不符密碼原則，原則為英+數，不得包含特殊符號字元)', async () => {
-			const bb = CustomUtils.deepClone(defBody);
-			bb.password = '786545#';
 
 			const endpoint = util.format(_ENDPOINT, defAccount.account);
 			const res = await agentClient
@@ -154,5 +137,6 @@ describe('Line io - update account spec', () => {
 			expect(acc.nickname).toBe(defAccount.nickname);
 			expect(acc.lineId).toBe(defBody.lineId);
 		});
+		test.todo('Switch line rich menu');
 	});
 });

@@ -48,27 +48,30 @@ describe('Account check spec', () => {
 		
 		// rebind mock http client - start
 		const nonExist = new CustomResult()
-			.withResult({
+			.withResult(JSON.stringify({
 				success: true,
 				data: {
 					accountExists: false,
 				},
-			});
+			}));
 
 		const existResult = new CustomResult()
-			.withResult({
+			.withResult(JSON.stringify({
 				success: true,
 				data: {
 					accountExists: true,
 				},
-			});
+			}));
 		
 		const http = mock<ICustomHttpClient>();
 		http.tryPostJson
 			.mockResolvedValueOnce(nonExist)
 			.mockResolvedValueOnce(existResult)
 			.mockResolvedValueOnce(nonExist);
-		defaultContainer.rebind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT).toConstantValue(http);
+		defaultContainer
+			.rebind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT)
+			.toConstantValue(http)
+			.whenTargetNamed(InjectorCodes.LUNA_HTTP_CLIENT);
 		// rebind mock http client - end
 	});
 	afterAll(async () => {
