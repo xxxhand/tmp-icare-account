@@ -1,9 +1,7 @@
-import { Response, NextFunction, Router } from 'express';
-import { injectable } from 'inversify';
+import { Request, Response, NextFunction, Router } from 'express';
 import * as util from 'util';
 import {
 	CustomResult,
-	defaultContainer,
 	lazyInject,
 	TNullable,
 	CustomUtils,
@@ -14,13 +12,12 @@ import {
 	commonInjectorCodes,
 	CustomError,
 } from '@demo/app-common';
-import { handleExpressAsync, ICustomExpressRequest } from '../application-types';
+import { handleExpressAsync } from '../application-types';
 import { ErrorCodes as domainErr } from '../../domain/enums/error-codes';
 import { InjectorCodes } from '../../domain/enums/injector-codes';
 import { ICodeRepository } from '../../domain/repositories/i-code-repository';
 import { CodeEntity } from '../../domain/entities/code-entity';
 
-@injectable()
 export class LineIOCodeController {
 
 	@lazyInject(InjectorCodes.I_CODE_REPO)
@@ -31,7 +28,7 @@ export class LineIOCodeController {
 	private _twnMobileFormat = /^09\d{8}$/;
 	private _smsTemplate = '這是驗證碼%s';
 
-	public sendCode = async (req: ICustomExpressRequest, res: Response, next: NextFunction): Promise<void> => {
+	public sendCode = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const { phone } = req.params;
 		LOGGER.info(`Request to send SMS to ${phone}`);
 		new CustomValidator()
@@ -64,8 +61,7 @@ export class LineIOCodeController {
 	}
 
 	public static build(): Router {
-		defaultContainer.bind(LineIOCodeController).toSelf().inSingletonScope();
-		const _ctrl = defaultContainer.get( LineIOCodeController);
+		const _ctrl = new LineIOCodeController();
 		const r = Router();
 		r.route('/codes/:phone')
 			.put(handleExpressAsync(_ctrl.sendCode));

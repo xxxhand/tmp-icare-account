@@ -120,4 +120,8 @@ export class CustomUtils {
 			.digest('hex')
 			.toString();
 	}
+
+	public static isEqual(var1: any, var2: any): boolean {
+		return lodash.isEqual(var1, var2);
+	}
 }

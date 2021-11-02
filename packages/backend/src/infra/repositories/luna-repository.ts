@@ -29,9 +29,10 @@ export class LunaRepository implements ILunaRepository {
 		}
 		requestOptions
 			.setUrl(`${defConf.LUNA_WEB.ROOT}/${defConf.LUNA_WEB.ACCOUNT}`)
+			.setTimeout(3)
 			.addHeader('x-request-from', 'web')
 			.addParameter('account', account)
-			.addParameter('pasword', password);
+			.addParameter('password', password);
 
 		const apiResult = await this._httpClient.tryPostJson(requestOptions);
 		if (!apiResult.isOK()) {
@@ -41,7 +42,7 @@ export class LunaRepository implements ILunaRepository {
 		try {
 			const msg = JSON.parse(apiResult.result) as ILunaLoginResult;
 			if (!msg.success) {
-				LOGGER.error(`Not logged in ${apiResult.result}`);
+				LOGGER.error(`Not logged in luna ${apiResult.result}`);
 				return undefined;
 			}
 			return msg.data as ILoginLunaUser;

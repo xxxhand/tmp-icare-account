@@ -1,16 +1,10 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as util from 'util';
 import {
 	CustomResult,
-	defaultContainer,
 	lazyInject,
 	TNullable,
 	CustomUtils,
 	LOGGER,
-	CustomValidator,
-	validateStrategy,
-	ISMSClient,
-	commonInjectorCodes,
 	CustomError,
 	CustomClassBuilder,
 	CustomHttpOption,
@@ -105,6 +99,7 @@ export class LineIOAccountController {
 			throw new CustomError(domainErr.ERR_ACCOUNT_PASS_WRONG);
 		}
 
+		// 若為Luna用戶，僅第一次登入需建立資料，第二次以後僅變更Line id
 		if (inLuna && !oAccount) {
 			oAccount = new AccountEntity();
 			oAccount.account = accountStr;
@@ -116,7 +111,13 @@ export class LineIOAccountController {
 			oAccount.password = CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt);
 		}
 
-		// TODO: compare password
+		// 僅iLearn用戶比對密碼
+		if (!oAccount.isLuna) {
+			const pwd = CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt);
+			if (!CustomUtils.isEqual(oAccount.password, pwd)) {
+				throw new CustomError(domainErr.ERR_ACCOUNT_PASS_WRONG);
+			}
+		}
 		
 		oAccount.lineId = <string>mReq?.lineId;
 		await this._accountRepo?.save(oAccount);
@@ -134,6 +135,7 @@ export class LineIOAccountController {
 			.patch(handleExpressAsync(_ctrl.update));
 		r.route('/login')
 			.post(handleExpressAsync(_ctrl.login));
+			
 		return r;
 	}
 }
