@@ -58,7 +58,5 @@ export interface ISMSClient {
 
 export interface ILineClient {
 	linkRichMenuToUser(id: string, menuId: string): Promise<void>;
-	getMiddleware(): any;
-	replyMessage(id: string, message: string): Promise<boolean>;
-	pushMessageToUsers(to: string[], message: string): Promise<boolean>;
+	pushTextToUsers(to: string[], message: string): Promise<boolean>;
 }

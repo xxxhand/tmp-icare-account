@@ -7,7 +7,7 @@ describe.skip('Line test', () => {
 			channelSecret: 'f9e01a93b0f5327b8a24fb3fc5ff919d',
 		}, ['aabc']);
 
-		const res = await client.pushMessageToUsers(['U3c743f0cb5dcbd0c4da72cf732579aa3'], 'I am test');
+		const res = await client.pushTextToUsers(['U3c743f0cb5dcbd0c4da72cf732579aa3'], 'I am test');
 		expect(res).toBe(true);
 	});
 });

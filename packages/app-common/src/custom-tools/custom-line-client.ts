@@ -1,4 +1,4 @@
-import { Client, ClientConfig, middleware } from '@line/bot-sdk';
+import { Client, ClientConfig } from '@line/bot-sdk';
 import { ILineClient } from '../custom-types';
 import { logger as LOGGER } from '../custom-tools/custom-logger';
 
@@ -35,24 +35,7 @@ export class CustomLineClient implements ILineClient {
 		await this._client.linkRichMenuToUser(id, menuId);
 	}
 
-	getMiddleware = (): any => {
-		return middleware({ channelSecret: <string>this._config.channelSecret });
-	}
-
-	replyMessage = async (id: string, message: string): Promise<boolean> => {
-		if (!id || id.length === 0) {
-			LOGGER.error('Target line id is empty');
-			return false;
-		}
-		if (!message || message.length === 0) {
-			LOGGER.error('Line message is empty');
-			return false;
-		}
-		await this._client.replyMessage(id, { type: 'text', text: message });
-		return true;
-	}
-
-	pushMessageToUsers = async (to: string[], message: string): Promise<boolean> => {
+	pushTextToUsers = async (to: string[], message: string): Promise<boolean> => {
 		if (!to || to.length === 0) {
 			LOGGER.error('Target line id is empty');
 			return false;
