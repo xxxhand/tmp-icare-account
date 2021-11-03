@@ -35,23 +35,15 @@
     <script src="./swagger-ui-standalone-preset.js"></script>
     <script>
         window.onload = function () {
-            let destination = 'http://localhost:9000'
-            const dn = location.hostname
-
-            if (/.cn$/.test(dn)) {
-                destination = 'https://api.pixseecare.com.cn'
-            } else {
-                if (/^test/.test(dn)) {
-                    destination = 'https://test.ipg-services.com'
-                } else if (/^api/.test(dn)) {
-                    destination = 'https://api.ipg-services.com'
-                } else if (/^staging/.test(dn)) {
-                    destination = 'https://staging.ipg-services.com'
-                }
+            let destination = 'http://localhost:9000/line_io'
+            let dn = location.hostname
+            if (/^localhost/.test(dn)) {
+                dn = 'http://localhost:9000'
             }
+
             // Begin Swagger UI call region
             const ui = SwaggerUIBundle({
-                url: `${destination}/api-docs/main_api.yaml`,
+                url: `${dn}/line_io/api-docs/main_api.yaml`,
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
