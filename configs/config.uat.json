@@ -1,0 +1,42 @@
+{
+  "ENABLE_CACHE": false,
+  "LUNA_WEB": {
+		"ROOT": "https://www.compal-health.com/Luna",
+		"ACCOUNT": "account/auth"
+	},
+  "DEFAULT_MONGO": {
+    "URI": "mongodb://104.199.235.97:32018/icare_account_v15",
+    "USER": "icare",
+    "PASS": "UATg0Icare",
+    "POOL_SIZE": 10,
+    "DB_NAME": "icare_account_v15"
+  },
+  "DEFAULT_REDIS": {
+    "URI": "",
+    "HOST": "",
+    "PORT": 0,
+    "PASS": "",
+    "DB_NAME": 0
+  },
+  "SESSION_CONFIGS": {
+		"SECRET": "IcarE_cOMPAl",
+		"EXPIRES_IN": 345600,
+		"DOMAIN_NAME": "",
+		"NAME": "icareuat.sessionId"
+	},
+  "DEFAULT_SMS": {
+		"HOST": "202.39.54.130",
+		"PORT": 8000,
+		"ACCOUNT": "89809080",
+		"PASSWORD": "740e2d0a"
+	},
+  "DEFAULT_LINE": {
+		"ACCESS_TOKEN": "",
+		"SECRET": "",
+    "RICH_MENUS": {
+			"DEFAULT_MENU": "",
+			"MAIN_MENU": ""
+		},
+		"CHANNEL_ID": ""
+	}
+}

@@ -47,15 +47,13 @@ export class LineIOCodeController {
 
 		try {
 			await this._smsClient?.tryConnect();
-			const isSended = await this._smsClient?.send(oCode.phone, util.format(this._smsTemplate, oCode.code));
-			LOGGER.info(`Send SMS to ${phone} result ${isSended}`);
+			await this._smsClient?.send(oCode.phone, util.format(this._smsTemplate, oCode.code));
 		} catch (ex) {
 			const err = CustomError.fromInstance(ex);
-			LOGGER.error(`Send SMS to ${phone} Fail ${err.stack}`);
+			LOGGER.error(`Send SMS to ${oCode.phone} Fail ${err.stack}`);
 			throw err;
 		}
-
-
+		
 		res.locals['result'] = new CustomResult();
 		await next();
 	}

@@ -37,7 +37,16 @@ interface IConfig {
 		PORT: number,
 		ACCOUNT: string,
 		PASSWORD: string,
-	}
+	},
+	DEFAULT_LINE: {
+		ACCESS_TOKEN: string,
+		SECRET: string,
+		RICH_MENUS: {
+			DEFAULT_MENU: string,
+			MAIN_MENU: string,
+		},
+		CHANNEL_ID: string,
+	},
 }
 
 LOGGER.info(`Run on environment ${customArgvs.env}`);

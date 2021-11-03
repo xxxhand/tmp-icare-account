@@ -11,6 +11,8 @@ import {
 	CustomRedisClient,
 	ISMSClient,
 	CustomSMSClient,
+	ILineClient,
+	CustomLineClient,
 } from '@demo/app-common';
 import { InjectorCodes } from '../domain/enums/injector-codes';
 import { AbstractSocketHandler } from '../application/workflows/abstract-socket-handler';
@@ -72,7 +74,7 @@ export class AppInitializer {
 
 	static tryInjector(): void {
 
-		/** tools */
+		//#region Custom tools
 		defaultContainer
 			.bind<ICustomHttpClient>(commonInjectorCodes.I_HTTP_CLIENT)
 			.toConstantValue(new CustomHttpClient())
@@ -94,7 +96,19 @@ export class AppInitializer {
 			.bind<ISMSClient>(commonInjectorCodes.I_SMS_CLIENT)
 			.toConstantValue(smsClient);
 
-		/** repositories */
+		
+		const lineClient = new CustomLineClient({
+			channelAccessToken: defConf.DEFAULT_LINE.ACCESS_TOKEN,
+			channelSecret: defConf.DEFAULT_LINE.SECRET,
+		}, Object.values(defConf.DEFAULT_LINE.RICH_MENUS));
+		defaultContainer
+			.bind<ILineClient>(commonInjectorCodes.I_LINE_CLIENT)
+			.toConstantValue(lineClient)
+			.whenTargetNamed(commonInjectorCodes.DEFAULT_LINE_CLIENT);
+
+		//#endregion
+		
+		//#region repositories
 		defaultContainer
 			.bind<IClientRepository>(InjectorCodes.I_CLIENT_REPO).to(ClientRepository).inSingletonScope();
 		defaultContainer
@@ -108,15 +122,21 @@ export class AppInitializer {
 		defaultContainer
 			.bind<ICodeRepository>(InjectorCodes.I_CODE_REPO).to(CodeRepository).inSingletonScope();
 
-		/** application services */
+		//#endregion
+
+		//#region application services
 		defaultContainer
 			.bind<IAccountService>(InjectorCodes.I_ACCOUNT_SRV).to(AccountService).inSingletonScope();
 
-		/** socket handlers */
+		//#endregion
+
+		//#region socket handlers 
 		defaultContainer
 			.bind<AbstractSocketHandler>(InjectorCodes.ABS_SOCKET_HANDLER)
 			.to(ChatRoomHandler)
 			.whenTargetNamed(InjectorCodes.CHAT_ROOM_HANDLER);
+		
+		//#endregion
 	}
 
 }

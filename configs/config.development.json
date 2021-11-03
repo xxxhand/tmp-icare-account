@@ -29,5 +29,14 @@
 		"PORT": 8000,
 		"ACCOUNT": "89809080",
 		"PASSWORD": "740e2d0a"
+	},
+  "DEFAULT_LINE": {
+		"ACCESS_TOKEN": "XK2t0IGDupGgjxdxwom/GAyVzvXqfo5hZMN2nyJ99tgr26oF9jDmbuYgjk2RrfXOlG8SIxVVlOMSoFSWf3YQF8s4J6kvnsncO5FimIHUXuDquxYe37je/CKZL0461CVjSiq4Eokf4HNUJA0GXs38AwdB04t89/1O/w1cDnyilFU=",
+		"SECRET": "f9e01a93b0f5327b8a24fb3fc5ff919d",
+    "RICH_MENUS": {
+			"DEFAULT_MENU": "aaaa",
+			"MAIN_MENU": "bbbb"
+		},
+		"CHANNEL_ID": "ffgh"
 	}
 }

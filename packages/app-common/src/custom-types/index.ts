@@ -47,10 +47,16 @@ export interface smsOptions {
 	password: string;
 	maxTryLimit: TNullable<number>;
 }
+
 export interface ISMSClient {
 	isConnected(): boolean;
 	isLogged(): boolean;
 	tryConnect(): Promise<void>;
 	send(phone: string, message: string): Promise<boolean>;
 	close(): Promise<void>;
+}
+
+export interface ILineClient {
+	linkRichMenuToUser(id: string, menuId: string): Promise<void>;
+	pushTextToUsers(to: string[], message: string): Promise<boolean>;
 }

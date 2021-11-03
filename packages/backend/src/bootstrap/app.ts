@@ -9,11 +9,11 @@ import { V1Router } from '../application/workflows/v1-router';
 import { MockRouter } from '../application/workflows/mock-router';
 import { LineIOV1Router } from '../application/workflows/line-io-v1-router';
 
-const _PUBLIC_PATH = '../../../../public';
 
 export class App {
 
 	private _app: TNullable<express.Application> = null;
+	private readonly _PUBLIC_PATH = '../../../../public';
 
 	constructor() {
 		this._app = express();
@@ -32,7 +32,8 @@ export class App {
 			throw new Error('Application is null');
 		}
 
-		this._app.use('/api-docs', express.static(path.resolve(<string>require.main?.path || __dirname, `${_PUBLIC_PATH}/api-docs`)));
+		this._app.use('/line_io/api-docs', express.static(path.resolve(<string>require.main?.path || __dirname, `${this._PUBLIC_PATH}/api-docs`)));
+		this._app.use('/line_io/liff', express.static(path.resolve(<string>require.main?.path || __dirname, `${this._PUBLIC_PATH}/liff`)));
 		this._app.use(express.json({ limit: '10mb' }));
 		this._app.use(express.urlencoded({ extended: false }));
 		this._app.use(this._makeSession());
