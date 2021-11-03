@@ -98,10 +98,11 @@ export class AppInitializer {
 			.bind<ISMSClient>(commonInjectorCodes.I_SMS_CLIENT)
 			.toConstantValue(smsClient);
 
+		
 		const lineClient = new CustomLineClient({
 			channelAccessToken: defConf.DEFAULT_LINE.ACCESS_TOKEN,
 			channelSecret: defConf.DEFAULT_LINE.SECRET,
-		}, defConf.DEFAULT_LINE.RICH_MENUS);
+		}, Object.values(defConf.DEFAULT_LINE.RICH_MENUS));
 		defaultContainer
 			.bind<ILineClient>(commonInjectorCodes.I_LINE_CLIENT)
 			.toConstantValue(lineClient)

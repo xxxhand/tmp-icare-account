@@ -60,5 +60,5 @@ export interface ILineClient {
 	linkRichMenuToUser(id: string, menuId: string): Promise<void>;
 	getMiddleware(): any;
 	replyMessage(id: string, message: string): Promise<boolean>;
-	pushMessage(to: string, message: string): Promise<boolean>;
+	pushMessageToUsers(to: string[], message: string): Promise<boolean>;
 }

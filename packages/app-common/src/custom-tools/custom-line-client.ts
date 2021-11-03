@@ -1,9 +1,7 @@
 import { Client, ClientConfig, middleware } from '@line/bot-sdk';
-import { injectable } from 'inversify';
 import { ILineClient } from '../custom-types';
 import { logger as LOGGER } from '../custom-tools/custom-logger';
 
-@injectable()
 export class CustomLineClient implements ILineClient {
 	private _client: Client;
 	private _config: ClientConfig;
@@ -54,7 +52,7 @@ export class CustomLineClient implements ILineClient {
 		return true;
 	}
 
-	pushMessage = async (to: string, message: string): Promise<boolean> => {
+	pushMessageToUsers = async (to: string[], message: string): Promise<boolean> => {
 		if (!to || to.length === 0) {
 			LOGGER.error('Target line id is empty');
 			return false;
@@ -63,7 +61,7 @@ export class CustomLineClient implements ILineClient {
 			LOGGER.error('Line message is empty');
 			return false;
 		}
-		await this._client.pushMessage(to, { type: 'text', text: message });
+		await this._client.multicast(to, { type: 'text', text: message });
 		return true;
 	}
 }

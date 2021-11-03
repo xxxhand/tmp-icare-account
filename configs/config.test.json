@@ -33,7 +33,10 @@
   "DEFAULT_LINE": {
 		"ACCESS_TOKEN": "aabc",
 		"SECRET": "ccde",
-    "RICH_MENUS": [],
+    "RICH_MENUS": {
+			"DEFAULT_MENU": "",
+			"MAIN_MENU": ""
+		},
 		"CHANNEL_ID": "ddef"
 	}
 }

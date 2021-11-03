@@ -8,7 +8,6 @@ import {
 	LOGGER,
 	CustomValidator,
 	validateStrategy,
-	CustomError,
 } from '@demo/app-common';
 import { handleExpressAsync } from '../application-types';
 import { ErrorCodes as domainErr } from '../../domain/enums/error-codes';
