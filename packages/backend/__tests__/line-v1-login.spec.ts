@@ -6,10 +6,9 @@ import {
 	defaultContainer,
 	IMongooseClient,
 	commonInjectorCodes,
-	ErrorCodes,
-	HttpCodes,
 	ICustomHttpClient,
 	CustomResult,
+	ILineClient,
 } from '@demo/app-common';
 import { AppInitializer } from '../src/bootstrap/app-initializer';
 import { App } from '../src/bootstrap/app';
@@ -17,7 +16,6 @@ import { ErrorCodes as domainErr } from '../src/domain/enums/error-codes';
 import { InjectorCodes } from '../src/domain/enums/injector-codes';
 import { AccountEntity } from '../src/domain/entities/account-entity';
 import { IAccountRepository } from '../src/domain/repositories/i-account-repository';
-import { ILoginLunaUser, ILunaLoginResult } from '../src/infra/types/luna-api-types';
 
 const _ENDPOINT = '/line_io/api/v1/login';
 interface IBody {
@@ -116,6 +114,20 @@ describe('Line io - login spec', () => {
 			.toConstantValue(http)
 			.whenTargetNamed(InjectorCodes.LUNA_HTTP_CLIENT);
 		//#endregion
+
+		//#region mock line client
+		const line = mock<ILineClient>();
+		line.linkRichMenuToUser
+			.mockResolvedValue();
+		line.pushTextToUsers
+			.mockResolvedValue(true);
+
+		defaultContainer
+			.rebind<ILineClient>(commonInjectorCodes.I_LINE_CLIENT)
+			.toConstantValue(line)
+			.whenTargetNamed(commonInjectorCodes.DEFAULT_LINE_CLIENT);
+		//#endregion
+
 	});
 	afterAll(async () => {
 		await db.clearData();
@@ -237,6 +249,5 @@ describe('Line io - login spec', () => {
 			expect(acc.isLuna).toBe(false);
 			expect(acc.lineId).toBe(defBody.lineId);
 		});
-		test.todo('Switch line rich menu');
 	});
 });

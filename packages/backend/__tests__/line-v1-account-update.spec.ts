@@ -1,12 +1,13 @@
 import * as superTest from 'supertest';
 import * as util from 'util';
+import { mock } from 'jest-mock-extended';
 import {
 	CustomError,
 	defaultContainer,
 	IMongooseClient,
 	commonInjectorCodes,
 	CustomUtils,
-	CustomValidator,
+	ILineClient,
 } from '@demo/app-common';
 import { AppInitializer } from '../src/bootstrap/app-initializer';
 import { App } from '../src/bootstrap/app';
@@ -48,6 +49,19 @@ describe('Line io - update account spec', () => {
 		defAccount.password = CustomUtils.hashPassword('a123456b', defAccount.salt);
 		defAccount.lineId = 'I_am_line_id';
 		defAccount = await accountRepo.save(defAccount) as AccountEntity;
+
+		//#region mock line client
+		const line = mock<ILineClient>();
+		line.linkRichMenuToUser
+			.mockResolvedValue();
+		line.pushTextToUsers
+			.mockResolvedValue(true);
+
+		defaultContainer
+			.rebind<ILineClient>(commonInjectorCodes.I_LINE_CLIENT)
+			.toConstantValue(line)
+			.whenTargetNamed(commonInjectorCodes.DEFAULT_LINE_CLIENT);
+		//#endregion		
 
 	});
 	afterAll(async () => {

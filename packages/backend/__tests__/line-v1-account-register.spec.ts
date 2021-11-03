@@ -1,12 +1,13 @@
 
 import * as superTest from 'supertest';
-import * as crypto from 'crypto';
+import { mock } from 'jest-mock-extended';
 import {
 	CustomError,
 	defaultContainer,
 	IMongooseClient,
 	commonInjectorCodes,
 	CustomUtils,
+	ILineClient,
 } from '@demo/app-common';
 import { AppInitializer } from '../src/bootstrap/app-initializer';
 import { App } from '../src/bootstrap/app';
@@ -55,6 +56,19 @@ describe('Line io - register account spec', () => {
 		validCode = await codeRepo.save(validCode) as CodeEntity;
 
 		defBody.code = validCode.code;
+
+		//#region mock line client
+		const line = mock<ILineClient>();
+		line.linkRichMenuToUser
+			.mockResolvedValue();
+		line.pushTextToUsers
+			.mockResolvedValue(true);
+
+		defaultContainer
+			.rebind<ILineClient>(commonInjectorCodes.I_LINE_CLIENT)
+			.toConstantValue(line)
+			.whenTargetNamed(commonInjectorCodes.DEFAULT_LINE_CLIENT);
+		//#endregion
 	});
 	afterAll(async () => {
 		await db.clearData();
@@ -256,6 +270,5 @@ describe('Line io - register account spec', () => {
 			expect(code).toBeTruthy();
 			expect(code.completed).toBe(true);
 		});
-		test.todo('Switch line rich menu');
 	});
 });

@@ -1,13 +1,18 @@
 import { Request, Response, NextFunction, Router } from 'express';
+import * as util from 'util';
 import {
+	defConf,
 	CustomResult,
 	lazyInject,
+	lazyInjectNamed,
 	TNullable,
 	CustomUtils,
 	LOGGER,
 	CustomError,
 	CustomClassBuilder,
 	CustomHttpOption,
+	ILineClient,
+	commonInjectorCodes,
 } from '@demo/app-common';
 import { handleExpressAsync } from '../application-types';
 import { ErrorCodes as domainErr } from '../../domain/enums/error-codes';
@@ -29,6 +34,11 @@ export class LineIOAccountController {
 	private _accountRepo: TNullable<IAccountRepository>;
 	@lazyInject(InjectorCodes.I_LUNA_REPO)
 	private _lunaRepo: TNullable<ILunaRepository>;
+	@lazyInjectNamed(commonInjectorCodes.I_LINE_CLIENT, commonInjectorCodes.DEFAULT_LINE_CLIENT)
+	private _lineClient: TNullable<ILineClient>;
+
+	private readonly _REGISTER_DONE = '歡迎%s，註冊時間為%s';
+	private readonly _LOGIN_DONE = '歡迎%s，登入時間為%s'
 
 	public create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const mReq = CustomClassBuilder.build(LineIORegisterRequest, req.body)?.checkRequired();
@@ -56,6 +66,8 @@ export class LineIOAccountController {
 		oCode.complete();
 		await this._codeRepo?.save(oCode);
 
+		await this._actionDone(oAccount, util.format(this._REGISTER_DONE, oAccount.name, new Date().toISOString()));
+
 		res.locals['result'] = new CustomResult();
 		await next();
 	}
@@ -74,6 +86,8 @@ export class LineIOAccountController {
 		oAccount.password = CustomUtils.hashPassword(<string>mReq?.password, oAccount.salt);
 		oAccount.lineId = <string>mReq?.lineId;
 		await this._accountRepo?.save(oAccount);
+
+		await this._actionDone(oAccount, util.format(this._REGISTER_DONE, oAccount.name, new Date().toISOString()));
 
 		res.locals['result'] = new CustomResult();
 		await next();
@@ -118,8 +132,21 @@ export class LineIOAccountController {
 		oAccount.lineId = <string>mReq?.lineId;
 		await this._accountRepo?.save(oAccount);
 
+		await this._actionDone(oAccount, util.format(this._LOGIN_DONE, oAccount.name, new Date().toISOString()));
+
 		res.locals['result'] = new CustomResult();
 		await next();
+	}
+
+	private _actionDone = async (account: AccountEntity, message: string): Promise<void> => {
+		LOGGER.info(`Notify to line with ${account.lineId}`);
+		try {
+			await this._lineClient?.linkRichMenuToUser(account.lineId, defConf.DEFAULT_LINE.RICH_MENUS.MAIN_MENU);
+			await this._lineClient?.pushTextToUsers([account.lineId], message);
+		} catch (ex) {
+			const err = CustomError.fromInstance(ex);
+			LOGGER.error(`Call line fail ${err.stack}`);
+		}
 	}
 
 	public static build(): Router {
