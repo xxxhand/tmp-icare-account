@@ -33,8 +33,6 @@ import { AccountService } from '../application/services/account-service';
 import { ICodeRepository } from '../domain/repositories/i-code-repository';
 import { CodeRepository } from '../infra/repositories/code-repository';
 import { LunaHttpClient } from '../infra/tools/luna-http-client';
-import { INotifyservice } from '../infra/services/interfaces/i-notify-service';
-import { NotifyService  } from '../infra/services/notify-service';
 
 export class AppInitializer {
 
@@ -124,11 +122,6 @@ export class AppInitializer {
 		defaultContainer
 			.bind<ICodeRepository>(InjectorCodes.I_CODE_REPO).to(CodeRepository).inSingletonScope();
 
-		//#endregion
-
-		//#region infra services
-		defaultContainer
-			.bind<INotifyservice>(InjectorCodes.I_NOFIFY_SRV).to(NotifyService).inSingletonScope();
 		//#endregion
 
 		//#region application services
